@@ -33,7 +33,7 @@ class CoordinatorAgent(Agent):
             msg = ACLMessage(ACLMessage.REQUEST)
             msg.add_receiver(agent_aid)
             msg.set_content("send_questions")
-            await self.post(msg)
+            self.post(msg)
 
     def react(self, message):
         if message.performative == ACLMessage.INFORM and message.content.startswith("questions:"):
@@ -50,7 +50,7 @@ class CoordinatorAgent(Agent):
                 msg = ACLMessage(ACLMessage.INFORM)
                 msg.add_receiver(self.ticket_agent)
                 msg.set_content(f"tickets:{tickets}")
-                await self.post(msg)
+                self.post(msg)
 
     def form_tickets(self, questions):
         # Формируем билеты из 2 вопросов с разным разделом и равной суммарной сложностью
