@@ -99,7 +99,7 @@ class QuestionAgent(Agent):
             msg = ACLMessage(ACLMessage.INFORM)
             msg.add_receiver(message.sender)
             msg.set_content(f"questions:{self.questions}")
-            await self.post(msg)
+            self.post(msg)
 
 
 class TicketAgent(Agent):
