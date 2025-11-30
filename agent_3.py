@@ -25,7 +25,7 @@ class CoordinatorAgent(Agent):
         self.pending_responses = 0
         self.all_questions = []
 
-    async def on_start(self):
+    def on_start(self):
         display_message(self.aid.localname, "Запуск CoordinatorAgent")
         # Запрашиваем вопросы у всех агентоа
         self.pending_responses = len(self.question_agents)
@@ -35,7 +35,7 @@ class CoordinatorAgent(Agent):
             msg.set_content("send_questions")
             await self.post(msg)
 
-    async def react(self, message):
+    def react(self, message):
         if message.performative == ACLMessage.INFORM and message.content.startswith("questions:"):
             # Получаем список вопросов от QuestionAgent
             content = message.content[len("questions:"):]
@@ -94,7 +94,7 @@ class QuestionAgent(Agent):
         super().__init__(aid)
         self.questions = questions_subset
 
-    async def react(self, message):
+    def react(self, message):
         if message.performative == ACLMessage.REQUEST and message.content == "send_questions":
             msg = ACLMessage(ACLMessage.INFORM)
             msg.add_receiver(message.sender)
@@ -106,7 +106,7 @@ class TicketAgent(Agent):
     def __init__(self, aid):
         super().__init__(aid)
 
-    async def react(self, message):
+    def react(self, message):
         if message.performative == ACLMessage.INFORM and message.content.startswith("tickets:"):
             content = message.content[len("tickets:"):]
             tickets = eval(content)
