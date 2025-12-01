@@ -33,7 +33,7 @@ class QuestionAgent(Agent):
             self.react_create_question(message)
 
     def react_create_question(self, message):
-        content = json.loads(message.content)
+        content = message.content
         info_id = content.get('info_id', None)
         rand_question = choice(self.questions)
         message = ACLMessage(ACLMessage.INFORM)
@@ -68,7 +68,7 @@ class TicketAgent(Agent):
     def react_create_ticket(self, message):
         info_id = uuid.uuid4()
 
-        content = json.loads(message.content)
+        content = message.content
         number_of_questions = content.get('number_of_questions', 2)
         req_diff = content.get('req_diff', 10) # TODO: проверка на сложность
         self.info[info_id] = {
@@ -91,7 +91,7 @@ class TicketAgent(Agent):
 
 
     def react_append_question(self, message):
-        content = json.loads(message.content)
+        content = message.content
 
         info_id = content.get('info_id', None)
 
