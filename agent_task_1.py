@@ -8,6 +8,7 @@ from pade.misc.utility import display_message, call_later, start_loop
 
 STARTED_AID = AID('starter@localhost:52003')
 
+MANAGER_AID = AID('manager@localhost:52000')
 
 
 class StarterAgent(Agent):
