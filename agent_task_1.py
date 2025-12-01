@@ -122,7 +122,18 @@ class ManagerAgent(Agent):
         display_message(self.aid.localname, message.sender)
         if message.performative == ACLMessage.INFORM and message.sender == STARTED_AID:
             display_message(self.aid.localname, 'Received message from starter')
+            self.react_create_ticket_list(message)
 
+    def react_create_ticket_list(self, message):
+        message = ACLMessage(ACLMessage.INFORM)
+        message.add_receiver(TICKET_AID)
+        message.set_content({
+            "number_of_questions": 2,
+            "req_diff": 10,
+        })
+        display_message(self.aid.localname, 'create ticket message to ticket agent sent')
+
+        self.send(message)
 
 class StarterAgent(Agent):
     def __init__(self, aid: AID):
