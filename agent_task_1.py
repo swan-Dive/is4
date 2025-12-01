@@ -90,18 +90,18 @@ class TicketAgent(Agent):
         for comb  in combinations(difficulties, number_of_questions):
             if sum(comb) == req_diff:
                 diff_combs.append(list(comb))
-        
+
         field_combs = combinations(fields, number_of_questions)
-        
+
         ticket_combs = []
-        
+
         for field_comb in field_combs:
             for diff_comb in diff_combs:
                 ticket_combs.append({
                     'fields': field_comb,
                     'diffs': diff_comb
                 })
-        
+        display_message(self.aid.localname, str(ticket_combs))
         self.info[str(info_id)] = {
             "questions": [],
             "number_of_questions": number_of_questions,
@@ -145,13 +145,13 @@ class TicketAgent(Agent):
             self.create_create_q_message(info_id, field, diff)
             display_message(
                 self.aid.localname, 'len of questions: {}'.format(len(ticket["questions"])) )
-    
+
     def get_next_comb(self, uid):
         info = self.info.get(uid, None)
         combs = info.get('combs', None)
         return combs[0]['fields'][len(info['questions'])], combs[0]['diffs'][len(info['questions'])]
-        
-    
+
+
 
 class ManagerAgent(Agent):
     def __init__(self, aid: AID):
