@@ -49,7 +49,7 @@ class ManagerAgent(Agent):
 
     def react(self, message):
         super(ManagerAgent, self).react(message)
-        print(message.sender)
+        display_message(self.aid.localname, message.sender)
         if message.performative == ACLMessage.INFORM and message.sender == STARTED_AID:
             display_message(self.aid.localname, 'Received message from starter')
 
@@ -62,14 +62,13 @@ class StarterAgent(Agent):
         super(StarterAgent, self).on_start()
         display_message(self.aid.localname, 'Starter Agent started.')
         self.send_message()
+        call_later(8.0, self.send_message)
 
     def send_message(self):
         message = ACLMessage(ACLMessage.INFORM)
         message.add_receiver(MANAGER_AID)
-        message.set_content({
-            "number_of_tickets": 5,
-            "number_of_questions": 5
-        })
+        message.set_content('Ola')
+        display_message(self.aid.localname, 'message_sent: {}'.format('OLA'))
         self.send(message)
 
 if __name__ == '__main__':
