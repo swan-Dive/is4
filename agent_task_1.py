@@ -33,15 +33,15 @@ class QuestionAgent(Agent):
             self.react_create_question(message)
 
     def react_create_question(self, message):
-        content = message.content
+        content = json.loads(message.content)
         info_id = content.get('info_id', None)
         rand_question = choice(self.questions)
         message = ACLMessage(ACLMessage.INFORM)
         message.add_receiver(QUESTION_AID)
-        message.set_content({
+        message.set_content(json.dumps({
             "info_id": info_id,
             "question": rand_question
-        })
+        }))
         display_message(self.aid.localname, 'question created')
 
         self.send(message)
@@ -68,7 +68,7 @@ class TicketAgent(Agent):
     def react_create_ticket(self, message):
         info_id = uuid.uuid4()
 
-        content = message.content
+        content = json.loads(message.content)
         number_of_questions = content.get('number_of_questions', 2)
         req_diff = content.get('req_diff', 10) # TODO: проверка на сложность
         self.info[info_id] = {
@@ -82,16 +82,16 @@ class TicketAgent(Agent):
     def create_create_q_message(self, uid):
         message = ACLMessage(ACLMessage.INFORM)
         message.add_receiver(QUESTION_AID)
-        message.set_content({
+        message.set_content(json.dumps({
             "info_id": uid,
-        })
+        }))
         display_message(self.aid.localname, 'create question message to q_agent sent')
 
         self.send(message)
 
 
     def react_append_question(self, message):
-        content = message.content
+        content = json.loads(message.content)
 
         info_id = content.get('info_id', None)
 
@@ -123,14 +123,14 @@ class ManagerAgent(Agent):
         if message.performative == ACLMessage.INFORM and message.sender == STARTED_AID:
             display_message(self.aid.localname, 'Received message from starter')
             self.react_create_ticket_list(message)
-
+            
     def react_create_ticket_list(self, message):
         message = ACLMessage(ACLMessage.INFORM)
         message.add_receiver(TICKET_AID)
-        message.set_content({
+        message.set_content(json.dumps({
             "number_of_questions": 2,
             "req_diff": 10,
-        })
+        }))
         display_message(self.aid.localname, 'create ticket message to ticket agent sent')
 
         self.send(message)
