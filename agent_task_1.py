@@ -44,7 +44,7 @@ class QuestionAgent(Agent):
             "info_id": str(info_id),
             "question": rand_question
         }))
-        display_message(self.aid.localname, 'question created')
+        display_message(self.aid.localname, 'question created: {}'.format(str(rand_question)))
 
         self.send(message)
 
