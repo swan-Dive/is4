@@ -39,7 +39,7 @@ class QuestionAgent(Agent):
         message = ACLMessage(ACLMessage.INFORM)
         message.add_receiver(QUESTION_AID)
         message.set_content(json.dumps({
-            "info_id": info_id,
+            "info_id": str(info_id),
             "question": rand_question
         }))
         display_message(self.aid.localname, 'question created')
@@ -83,7 +83,7 @@ class TicketAgent(Agent):
         message = ACLMessage(ACLMessage.INFORM)
         message.add_receiver(QUESTION_AID)
         message.set_content(json.dumps({
-            "info_id": uid,
+            "info_id": str(uid),
         }))
         display_message(self.aid.localname, 'create question message to q_agent sent')
 
@@ -123,7 +123,7 @@ class ManagerAgent(Agent):
         if message.performative == ACLMessage.INFORM and message.sender == STARTED_AID:
             display_message(self.aid.localname, 'Received message from starter')
             self.react_create_ticket_list(message)
-            
+
     def react_create_ticket_list(self, message):
         message = ACLMessage(ACLMessage.INFORM)
         message.add_receiver(TICKET_AID)
