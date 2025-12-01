@@ -100,7 +100,7 @@ class TicketAgent(Agent):
         content = json.loads(message.content)
 
         info_id = content.get('info_id', None)
-
+        display_message(self.aid.localname, 'received append question to uid:{}'.format(info_id))
         ticket = self.info.get(info_id, None)
         if ticket is None:
             pass #todo: validate
