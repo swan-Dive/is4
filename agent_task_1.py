@@ -181,7 +181,7 @@ class ManagerAgent(Agent):
         message.add_receiver(TICKET_AID)
         message.set_content(json.dumps({
             "number_of_questions": 2,
-            "req_diff": 10,
+            "req_diff": 7,
         }))
         display_message(self.aid.localname, 'create ticket message to ticket agent sent')
 
