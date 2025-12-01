@@ -1,5 +1,8 @@
+import json
 import random
 import secrets
+import uuid
+from secrets import choice
 
 from pade.acl.aid import AID
 from pade.acl.messages import ACLMessage
@@ -16,8 +19,9 @@ QUESTION_AID = AID('question@localhost:52002')
 STARTED_AID = AID('starter@localhost:52003')
 
 class QuestionAgent(Agent):
-    def __init__(self, aid: AID):
+    def __init__(self,pos_questions, aid: AID, ):
         super(QuestionAgent, self).__init__(aid)
+        self.questions = pos_questions
 
     def on_start(self):
         super(QuestionAgent, self).on_start()
@@ -25,11 +29,28 @@ class QuestionAgent(Agent):
 
     def react(self, message):
         super(QuestionAgent, self).react(message)
+        if message.performative == ACLMessage.INFORM and message.sender == TICKET_AID:
+            self.react_create_question(message)
+
+    def react_create_question(self, message):
+        content = json.loads(message.content)
+        info_id = content.get('info_id', None)
+        rand_question = choice(self.questions)
+        message = ACLMessage(ACLMessage.INFORM)
+        message.add_receiver(QUESTION_AID)
+        message.set_content({
+            "info_id": info_id,
+            "question": rand_question
+        })
+        display_message(self.aid.localname, 'question created')
+
+        self.send(message)
 
 
 class TicketAgent(Agent):
     def __init__(self, aid: AID):
         super(TicketAgent, self).__init__(aid)
+        self.info = {}
 
     def on_start(self):
         super(TicketAgent, self).on_start()
@@ -37,6 +58,55 @@ class TicketAgent(Agent):
 
     def react(self, message):
         super(TicketAgent, self).react(message)
+
+        if message.performative == ACLMessage.INFORM and message.sender == MANAGER_AID:
+            self.react_create_ticket(message)
+        elif message.performative == ACLMessage.INFORM and message.sender == QUESTION_AID:
+            self.react_append_question(message)
+
+
+    def react_create_ticket(self, message):
+        info_id = uuid.uuid4()
+
+        content = json.loads(message.content)
+        number_of_questions = content.get('number_of_questions', 2)
+        req_diff = content.get('req_diff', 10) # TODO: проверка на сложность
+        self.info[info_id] = {
+            "questions": [],
+            "number_of_questions": number_of_questions,
+            "req_diff": req_diff
+        }
+        self.create_create_q_message(info_id)
+
+
+    def create_create_q_message(self, uid):
+        message = ACLMessage(ACLMessage.INFORM)
+        message.add_receiver(QUESTION_AID)
+        message.set_content({
+            "info_id": uid,
+        })
+        display_message(self.aid.localname, 'create question message to q_agent sent')
+
+        self.send(message)
+
+
+    def react_append_question(self, message):
+        content = json.loads(message.content)
+
+        info_id = content.get('info_id', None)
+
+        ticket = self.info.get(info_id, None)
+        if ticket is None:
+            pass #todo: validate
+
+        question = content.get('question', None)
+
+        ticket.questions.append(question)
+        if len(ticket.questions) <5 :
+
+            self.create_create_q_message(info_id)
+        display_message(
+            self.aid.localname, 'len of questions: {}'.format(len(ticket.questions)) )
 
 
 class ManagerAgent(Agent):
@@ -52,6 +122,7 @@ class ManagerAgent(Agent):
         display_message(self.aid.localname, message.sender)
         if message.performative == ACLMessage.INFORM and message.sender == STARTED_AID:
             display_message(self.aid.localname, 'Received message from starter')
+
 
 class StarterAgent(Agent):
     def __init__(self, aid: AID):
@@ -76,9 +147,9 @@ if __name__ == '__main__':
         "id": 'Qid_{}'.format(i),
         "diff": random.randint(1, 5),
         "field": secrets.choice(fields)
-    }for i in range(0, 100)]
+    } for i in range(0, 100)]
 
-    q_agent = QuestionAgent(QUESTION_AID)
+    q_agent = QuestionAgent(aid=QUESTION_AID, pos_questions=questions)
     t_agent = TicketAgent(TICKET_AID)
 
     m_agent = ManagerAgent(MANAGER_AID)
