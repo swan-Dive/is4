@@ -83,5 +83,5 @@ if __name__ == '__main__':
     m_agent = ManagerAgent(MANAGER_AID)
     s_agent = StarterAgent(STARTED_AID)
     
-    start_loop([q_agent, t_agent, m_agent, s_agent])
+    start_loop([q_agent, t_agent, m_agent])
     
