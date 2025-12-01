@@ -2,7 +2,7 @@ import json
 import random
 import secrets
 import uuid
-from itertools import combinations
+from itertools import combinations, combinations_with_replacement
 from secrets import choice
 
 from pade.acl.aid import AID
@@ -87,7 +87,7 @@ class TicketAgent(Agent):
         number_of_questions = content.get('number_of_questions', 2)
         req_diff = content.get('req_diff', 10) # TODO: проверка на сложность
         diff_combs = []
-        for comb  in combinations(difficulties, number_of_questions):
+        for comb  in combinations_with_replacement(difficulties, number_of_questions):
             display_message(self.aid.localname, str(sum(comb)))
             if sum(comb) == req_diff:
                 diff_combs.append(list(comb))
@@ -137,8 +137,11 @@ class TicketAgent(Agent):
             raise
 
         question = content.get('question', None)
-
-        ticket["questions"].append(question)
+        if question is None:
+            ticket['combs'].pop(0)
+            ticket['questions'] = []
+        else:
+            ticket["questions"].append(question)
         field, diff = self.get_next_comb(info_id)
         if len(ticket["questions"]) >= ticket['number_of_questions']:
             display_message(self.aid.localname, 'we are done: {}'.format(ticket['questions']))
