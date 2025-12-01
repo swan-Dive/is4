@@ -2,6 +2,7 @@ import json
 import random
 import secrets
 import uuid
+from itertools import combinations
 from secrets import choice
 
 from pade.acl.aid import AID
@@ -12,6 +13,8 @@ from pade.misc.utility import display_message, call_later, start_loop
 fields = ['Теоретическая информатика', "Техническая информатика", 'Прикладная информатика', 'Информационные системы',
           'Компьютерные сети и телекоммуникации', 'Базы данных', 'Информационная безопасность и кибербезопасность',
           'Анализ данных и визуализация']
+
+difficulties = [1,2,3,4,5]
 
 MANAGER_AID = AID('manager@localhost:52000')
 TICKET_AID = AID('ticket@localhost:52001')
@@ -37,7 +40,13 @@ class QuestionAgent(Agent):
     def react_create_question(self, message):
         content = json.loads(message.content)
         info_id = content.get('info_id', None)
-        rand_question = choice(self.questions)
+        diff = content.get('diff', None)
+        field = content.get('field', None)
+        appl_questions = []
+        for q in self.questions:
+            if q['diff'] == diff and q['field'] == field:
+                appl_questions.append(q)
+        rand_question = choice(appl_questions)
         message = ACLMessage(ACLMessage.INFORM)
         message.add_receiver(TICKET_AID)
         message.set_content(json.dumps({
@@ -77,19 +86,39 @@ class TicketAgent(Agent):
         content = json.loads(message.content)
         number_of_questions = content.get('number_of_questions', 2)
         req_diff = content.get('req_diff', 10) # TODO: проверка на сложность
+        diff_combs = []
+        for comb  in combinations(difficulties, number_of_questions):
+            if sum(comb) == req_diff:
+                diff_combs.append(list(comb))
+        
+        field_combs = combinations(fields, number_of_questions)
+        
+        ticket_combs = []
+        
+        for field_comb in field_combs:
+            for diff_comb in diff_combs:
+                ticket_combs.append({
+                    'fields': field_comb,
+                    'diffs': diff_comb
+                })
+        
         self.info[str(info_id)] = {
             "questions": [],
             "number_of_questions": number_of_questions,
-            "req_diff": req_diff
+            "req_diff": req_diff,
+            'combs': ticket_combs
         }
-        self.create_create_q_message(info_id)
+        field, diff = self.get_next_comb(str(info_id))
+        self.create_create_q_message(info_id,field, diff )
 
 
-    def create_create_q_message(self, uid):
+    def create_create_q_message(self, uid, field, diff):
         message = ACLMessage(ACLMessage.INFORM)
         message.add_receiver(QUESTION_AID)
         message.set_content(json.dumps({
             "info_id": str(uid),
+            "field": field,
+            "diff": diff
         }))
         display_message(self.aid.localname, 'create question message to q_agent sent')
 
@@ -104,16 +133,25 @@ class TicketAgent(Agent):
         ticket = self.info.get(info_id, None)
         if ticket is None:
             pass #todo: validate
+            raise
 
         question = content.get('question', None)
 
         ticket["questions"].append(question)
-        if len(ticket["questions"]) <5 :
-
-            self.create_create_q_message(info_id)
-        display_message(
-            self.aid.localname, 'len of questions: {}'.format(len(ticket["questions"])) )
-
+        field, diff = self.get_next_comb(info_id)
+        if len(ticket["questions"]) >= ticket['number_of_questions']:
+            display_message(self.aid.localname, 'we are done: {}'.format(ticket['questions']))
+        else:
+            self.create_create_q_message(info_id, field, diff)
+            display_message(
+                self.aid.localname, 'len of questions: {}'.format(len(ticket["questions"])) )
+    
+    def get_next_comb(self, uid):
+        info = self.info.get(uid, None)
+        combs = info.get('combs', None)
+        return combs[0]['fields'][len(info['questions'])], combs[0]['diffs'][len(info['questions'])]
+        
+    
 
 class ManagerAgent(Agent):
     def __init__(self, aid: AID):
