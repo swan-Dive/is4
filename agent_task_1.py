@@ -142,10 +142,11 @@ class TicketAgent(Agent):
             ticket['questions'] = []
         else:
             ticket["questions"].append(question)
-        field, diff = self.get_next_comb(info_id)
+  
         if len(ticket["questions"]) >= ticket['number_of_questions']:
             display_message(self.aid.localname, 'we are done: {}'.format(ticket['questions']))
         else:
+            field, diff = self.get_next_comb(info_id)
             self.create_create_q_message(info_id, field, diff)
             display_message(
                 self.aid.localname, 'len of questions: {}'.format(len(ticket["questions"])) )
