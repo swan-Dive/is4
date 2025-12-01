@@ -107,12 +107,12 @@ class TicketAgent(Agent):
 
         question = content.get('question', None)
 
-        ticket.questions.append(question)
-        if len(ticket.questions) <5 :
+        ticket["questions"].append(question)
+        if len(ticket["questions"]) <5 :
 
             self.create_create_q_message(info_id)
         display_message(
-            self.aid.localname, 'len of questions: {}'.format(len(ticket.questions)) )
+            self.aid.localname, 'len of questions: {}'.format(len(ticket["questions"])) )
 
 
 class ManagerAgent(Agent):
