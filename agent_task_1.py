@@ -77,7 +77,7 @@ class TicketAgent(Agent):
         content = json.loads(message.content)
         number_of_questions = content.get('number_of_questions', 2)
         req_diff = content.get('req_diff', 10) # TODO: проверка на сложность
-        self.info[info_id] = {
+        self.info[str(info_id)] = {
             "questions": [],
             "number_of_questions": number_of_questions,
             "req_diff": req_diff
