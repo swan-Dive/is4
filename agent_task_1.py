@@ -30,6 +30,8 @@ class QuestionAgent(Agent):
     def react(self, message):
         super(QuestionAgent, self).react(message)
         if message.performative == ACLMessage.INFORM and message.sender == TICKET_AID:
+            display_message(self.aid.localname, 'Received message from ticket manager')
+
             self.react_create_question(message)
 
     def react_create_question(self, message):
@@ -37,7 +39,7 @@ class QuestionAgent(Agent):
         info_id = content.get('info_id', None)
         rand_question = choice(self.questions)
         message = ACLMessage(ACLMessage.INFORM)
-        message.add_receiver(QUESTION_AID)
+        message.add_receiver(TICKET_AID)
         message.set_content(json.dumps({
             "info_id": str(info_id),
             "question": rand_question
@@ -60,8 +62,12 @@ class TicketAgent(Agent):
         super(TicketAgent, self).react(message)
 
         if message.performative == ACLMessage.INFORM and message.sender == MANAGER_AID:
+            display_message(self.aid.localname, 'Received message from manager')
+
             self.react_create_ticket(message)
         elif message.performative == ACLMessage.INFORM and message.sender == QUESTION_AID:
+            display_message(self.aid.localname, 'Received message from q agent')
+
             self.react_append_question(message)
 
 
@@ -119,7 +125,7 @@ class ManagerAgent(Agent):
 
     def react(self, message):
         super(ManagerAgent, self).react(message)
-        display_message(self.aid.localname, message.sender)
+
         if message.performative == ACLMessage.INFORM and message.sender == STARTED_AID:
             display_message(self.aid.localname, 'Received message from starter')
             self.react_create_ticket_list(message)
