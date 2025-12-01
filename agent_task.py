@@ -49,7 +49,8 @@ class ManagerAgent(Agent):
 
     def react(self, message):
         super(ManagerAgent, self).react(message)
-        display_message(self.aid.localname, 'Received message from starter')
+        
+        display_message(self.aid.localname, 'Received message from starter: {}'.format(message))
 
 class StarterAgent(Agent):
     def __init__(self, aid: AID):
@@ -81,7 +82,6 @@ if __name__ == '__main__':
     t_agent = TicketAgent(TICKET_AID)
 
     m_agent = ManagerAgent(MANAGER_AID)
-    s_agent = StarterAgent(STARTED_AID)
-    
-    start_loop([q_agent, t_agent, m_agent])
-    
+    # s_agent = StarterAgent(STARTED_AID)
+
+    start_loop([q_agent, t_agent, m_agent,])
