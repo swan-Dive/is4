@@ -88,6 +88,7 @@ class TicketAgent(Agent):
         req_diff = content.get('req_diff', 10) # TODO: проверка на сложность
         diff_combs = []
         for comb  in combinations(difficulties, number_of_questions):
+            display_message(self.aid.localname, str(sum(comb)))
             if sum(comb) == req_diff:
                 diff_combs.append(list(comb))
 
