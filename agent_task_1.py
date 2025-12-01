@@ -46,7 +46,10 @@ class QuestionAgent(Agent):
         for q in self.questions:
             if q['diff'] == diff and q['field'] == field:
                 appl_questions.append(q)
-        rand_question = choice(appl_questions)
+        if len(appl_questions):
+            rand_question = choice(appl_questions)
+        else:
+            rand_question = None
         message = ACLMessage(ACLMessage.INFORM)
         message.add_receiver(TICKET_AID)
         message.set_content(json.dumps({
@@ -142,7 +145,7 @@ class TicketAgent(Agent):
             ticket['questions'] = []
         else:
             ticket["questions"].append(question)
-  
+
         if len(ticket["questions"]) >= ticket['number_of_questions']:
             display_message(self.aid.localname, 'we are done: {}'.format(ticket['questions']))
         else:
