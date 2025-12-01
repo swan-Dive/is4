@@ -49,8 +49,9 @@ class ManagerAgent(Agent):
 
     def react(self, message):
         super(ManagerAgent, self).react(message)
+        print(message.sender)
         if message.performative == ACLMessage.INFORM and message.sender == STARTED_AID:
-            display_message(self.aid.localname, 'Received message from starter')  
+            display_message(self.aid.localname, 'Received message from starter')
 
 class StarterAgent(Agent):
     def __init__(self, aid: AID):
