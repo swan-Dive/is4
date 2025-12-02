@@ -105,6 +105,7 @@ class TicketAgent(Agent):
                     'fields': field_comb,
                     'diffs': diff_comb
                 })
+        random.shuffle(ticket_combs)
         display_message(self.aid.localname, str(ticket_combs))
         self.info[str(info_id)] = {
             "questions": [],
@@ -136,28 +137,47 @@ class TicketAgent(Agent):
         display_message(self.aid.localname, 'received append question to uid:{}'.format(info_id))
         ticket = self.info.get(info_id, None)
         if ticket is None:
-            pass #todo: validate
-            raise
+            self.return_error_message('unknown ticket uuid')
 
         question = content.get('question', None)
         if question is None:
             ticket['combs'].pop(0)
             ticket['questions'] = []
+            if len(ticket['combs']) == 0:
+
+                self.return_error_message('No possible combinations with those criteria`s.')
+                return
         else:
             ticket["questions"].append(question)
 
         if len(ticket["questions"]) >= ticket['number_of_questions']:
-            display_message(self.aid.localname, 'we are done: {}'.format(ticket['questions']))
+            display_message(self.aid.localname, 'ticket gathered')
+            message = ACLMessage(ACLMessage.INFORM)
+            message.add_receiver(MANAGER_AID)
+            message.set_content(json.dumps({
+                "questions": ticket['questions'],
+            }))
+            self.send(message)
+
         else:
             field, diff = self.get_next_comb(info_id)
             self.create_create_q_message(info_id, field, diff)
-            display_message(
-                self.aid.localname, 'len of questions: {}'.format(len(ticket["questions"])) )
+
 
     def get_next_comb(self, uid):
         info = self.info.get(uid, None)
         combs = info.get('combs', None)
         return combs[0]['fields'][len(info['questions'])], combs[0]['diffs'][len(info['questions'])]
+
+    def return_error_message(self, error: str):
+        message = ACLMessage(ACLMessage.INFORM)
+        message.add_receiver(MANAGER_AID)
+        message.set_content(json.dumps({
+            "error": error
+        }))
+        display_message(self.aid.localname, 'ERROR RAISED, returning to manager')
+
+        self.send(message)
 
 
 
@@ -175,6 +195,16 @@ class ManagerAgent(Agent):
         if message.performative == ACLMessage.INFORM and message.sender == STARTED_AID:
             display_message(self.aid.localname, 'Received message from starter')
             self.react_create_ticket_list(message)
+
+        if message.performative == ACLMessage.INFORM and message.sender == TICKET_AID:
+            display_message(self.aid.localname, 'Received message from ticket agent')
+            content = json.loads(message.content)
+            error = content.get('error', None)
+            if error is not None:
+                display_message(self.aid.localname, 'Could`nt create a ticket, error: {}'.format(error))
+                return
+            ticket_questions = content.get('questions', None)
+            display_message(self.aid.localname, 'ticket questions: {}'.format(ticket_questions))
 
     def react_create_ticket_list(self, message):
         message = ACLMessage(ACLMessage.INFORM)
@@ -208,7 +238,7 @@ class StarterAgent(Agent):
 if __name__ == '__main__':
     questions = [{
         "id": 'Qid_{}'.format(i),
-        "diff": random.randint(1, 5),
+        "diff": random.randint(min(difficulties), max(difficulties)),
         "field": secrets.choice(fields)
     } for i in range(0, 100)]
 
