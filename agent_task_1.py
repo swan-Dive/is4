@@ -195,7 +195,7 @@ class ManagerAgent(Agent):
         self.number_of_tickets = 0
         self.req_diff = 0
         self.number_of_questions = 0
-        
+
     def on_start(self):
         super(ManagerAgent, self).on_start()
         display_message(self.aid.localname, 'Manager Agent started.')
@@ -209,7 +209,7 @@ class ManagerAgent(Agent):
             number_of_tickets = content.get('number_of_tickets', None)
             number_of_questions = content.get('number_of_questions', None)
             req_diff = content.get('req_diff', None)
-            
+
             if number_of_tickets is not None and number_of_questions is not None and req_diff is not None:
                 self.number_of_tickets = number_of_tickets
                 self.number_of_questions = number_of_questions
@@ -226,7 +226,7 @@ class ManagerAgent(Agent):
                     self.tickets.append(ticket_questions)
             else:
                 display_message(self.aid.localname, 'Could`nt create a ticket, error: {}'.format(error))
-            
+
             if self.tickets < self.number_of_tickets:
                 self.react_create_ticket_list()
             else:
@@ -234,7 +234,7 @@ class ManagerAgent(Agent):
 
     def react_create_ticket_list(self):
 
-   
+
         new_message = ACLMessage(ACLMessage.INFORM)
         new_message.add_receiver(TICKET_AID)
         new_message.set_content(json.dumps({
@@ -262,12 +262,13 @@ class StarterAgent(Agent):
         super(StarterAgent, self).__init__(aid)
         # comp_temp = ComportTemporal(self,  15.0, self.send_message)
         # self.behaviours.append(comp_temp)
-     
+
 
     def on_start(self):
         super(StarterAgent, self).on_start()
         display_message(self.aid.localname, 'Starter Agent started.')
-        self.send_message()
+        
+        call_later(4.0, self.send_message)
 
     def send_message(self):
         message = ACLMessage(ACLMessage.INFORM)
