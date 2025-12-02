@@ -7,6 +7,7 @@ from secrets import choice
 
 from pade.acl.aid import AID
 from pade.acl.messages import ACLMessage
+from pade.behaviours.protocols import TimedBehaviour
 from pade.core.agent import Agent
 from pade.misc.utility import display_message, call_later, start_loop
 
@@ -207,32 +208,50 @@ class ManagerAgent(Agent):
             display_message(self.aid.localname, 'ticket questions: {}'.format(ticket_questions))
 
     def react_create_ticket_list(self, message):
-        message = ACLMessage(ACLMessage.INFORM)
-        message.add_receiver(TICKET_AID)
-        message.set_content(json.dumps({
-            "number_of_questions": 2,
-            "req_diff": 7,
+        
+        content = json.loads(message.content)
+        number_of_questions = content.get('number_of_questions', 2)
+        req_diff = content.get('req_diff', 10)
+        new_message = ACLMessage(ACLMessage.INFORM)
+        new_message.add_receiver(TICKET_AID)
+        new_message.set_content(json.dumps({
+            "number_of_questions": number_of_questions,
+            "req_diff": req_diff,
         }))
         display_message(self.aid.localname, 'create ticket message to ticket agent sent')
 
-        self.send(message)
+        self.send(new_message)
+
+
+class ComportTemporal(TimedBehaviour):
+    def __init__(self, agent, time, send_message):
+        super(ComportTemporal, self).__init__(agent, time)
+        self.send_message = send_message
+    def on_time(self):
+        super(ComportTemporal, self).on_time()
+        display_message(self.agent.aid.localname, 'Hello World!')
+        self.send_message()
+
+
 
 class StarterAgent(Agent):
     def __init__(self, aid: AID):
         super(StarterAgent, self).__init__(aid)
-
+        comp_temp = ComportTemporal(self, 3.0, self.send_message)
+        self.behaviours.append(comp_temp)
 
     def on_start(self):
         super(StarterAgent, self).on_start()
         display_message(self.aid.localname, 'Starter Agent started.')
-        self.send_message()
-        call_later(8.0, self.send_message)
+
 
     def send_message(self):
         message = ACLMessage(ACLMessage.INFORM)
         message.add_receiver(MANAGER_AID)
-        message.set_content('Ola')
-        display_message(self.aid.localname, 'message_sent: {}'.format('OLA'))
+        message.set_content(json.dumps({
+            "number_of_questions": random.randint(2,5),
+            "req_diff": random.randint(5, 25),
+        }))
         self.send(message)
 
 if __name__ == '__main__':
