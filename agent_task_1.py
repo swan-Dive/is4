@@ -191,7 +191,11 @@ class TicketAgent(Agent):
 class ManagerAgent(Agent):
     def __init__(self, aid: AID):
         super(ManagerAgent, self).__init__(aid)
-
+        self.tickets = []
+        self.number_of_tickets = 0
+        self.req_diff = 0
+        self.number_of_questions = 0
+        
     def on_start(self):
         super(ManagerAgent, self).on_start()
         display_message(self.aid.localname, 'Manager Agent started.')
@@ -201,28 +205,41 @@ class ManagerAgent(Agent):
 
         if message.performative == ACLMessage.INFORM and message.sender == STARTED_AID:
             display_message(self.aid.localname, 'Received message from starter')
-            self.react_create_ticket_list(message)
+            content = json.loads(message.content)
+            number_of_tickets = content.get('number_of_tickets', None)
+            number_of_questions = content.get('number_of_questions', None)
+            req_diff = content.get('req_diff', None)
+            
+            if number_of_tickets is not None and number_of_questions is not None and req_diff is not None:
+                self.number_of_tickets = number_of_tickets
+                self.number_of_questions = number_of_questions
+                self.req_diff = req_diff
+                self.react_create_ticket_list()
 
         if message.performative == ACLMessage.INFORM and message.sender == TICKET_AID:
             display_message(self.aid.localname, 'Received message from ticket agent')
             content = json.loads(message.content)
             error = content.get('error', None)
-            if error is not None:
-                display_message(self.aid.localname, 'Could`nt create a ticket, error: {}'.format(error))
-                return
             ticket_questions = content.get('questions', None)
-            display_message(self.aid.localname, 'ticket questions: {}'.format(ticket_questions))
+            if error is None:
+                if ticket_questions is not None:
+                    self.tickets.append(ticket_questions)
+            else:
+                display_message(self.aid.localname, 'Could`nt create a ticket, error: {}'.format(error))
+            
+            if self.tickets < self.number_of_tickets:
+                self.react_create_ticket_list()
+            else:
+                display_message(self.aid.localname, 'created {} number of ticket, tickets: {}'.format(self.number_of_tickets, self.tickets))
 
-    def react_create_ticket_list(self, message):
+    def react_create_ticket_list(self):
 
-        content = json.loads(message.content)
-        number_of_questions = content.get('number_of_questions', 2)
-        req_diff = content.get('req_diff', 10)
+   
         new_message = ACLMessage(ACLMessage.INFORM)
         new_message.add_receiver(TICKET_AID)
         new_message.set_content(json.dumps({
-            "number_of_questions": number_of_questions,
-            "req_diff": req_diff,
+            "number_of_questions": self.number_of_questions,
+            "req_diff": self.req_diff,
         }))
         display_message(self.aid.localname, 'create ticket message to ticket agent sent')
 
@@ -243,13 +260,14 @@ class ComportTemporal(TimedBehaviour):
 class StarterAgent(Agent):
     def __init__(self, aid: AID):
         super(StarterAgent, self).__init__(aid)
-        comp_temp = ComportTemporal(self, 3.0, self.send_message)
-        self.behaviours.append(comp_temp)
+        # comp_temp = ComportTemporal(self,  15.0, self.send_message)
+        # self.behaviours.append(comp_temp)
+     
 
     def on_start(self):
         super(StarterAgent, self).on_start()
         display_message(self.aid.localname, 'Starter Agent started.')
-
+        self.send_message()
 
     def send_message(self):
         message = ACLMessage(ACLMessage.INFORM)
@@ -257,6 +275,7 @@ class StarterAgent(Agent):
         message.set_content(json.dumps({
             "number_of_questions": random.randint(2,5),
             "req_diff": random.randint(5, 25),
+            "number_of_tickets": 10
         }))
         self.send(message)
 
