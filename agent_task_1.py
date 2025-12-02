@@ -107,13 +107,17 @@ class TicketAgent(Agent):
                     'diffs': diff_comb
                 })
         random.shuffle(ticket_combs)
-        display_message(self.aid.localname, str(ticket_combs))
+
         self.info[str(info_id)] = {
             "questions": [],
             "number_of_questions": number_of_questions,
             "req_diff": req_diff,
             'combs': ticket_combs
         }
+        if len(ticket_combs) == 0:
+            self.return_error_message('No possible combinations with those criteria`s.')
+            del self.info[str(info_id)]
+            return
         field, diff = self.get_next_comb(str(info_id))
         self.create_create_q_message(info_id,field, diff )
 
@@ -147,6 +151,7 @@ class TicketAgent(Agent):
             if len(ticket['combs']) == 0:
 
                 self.return_error_message('No possible combinations with those criteria`s.')
+                del self.info[str(info_id)]
                 return
         else:
             ticket["questions"].append(question)
@@ -158,6 +163,7 @@ class TicketAgent(Agent):
             message.set_content(json.dumps({
                 "questions": ticket['questions'],
             }))
+            del self.info[str(info_id)]
             self.send(message)
 
         else:
@@ -208,7 +214,7 @@ class ManagerAgent(Agent):
             display_message(self.aid.localname, 'ticket questions: {}'.format(ticket_questions))
 
     def react_create_ticket_list(self, message):
-        
+
         content = json.loads(message.content)
         number_of_questions = content.get('number_of_questions', 2)
         req_diff = content.get('req_diff', 10)
