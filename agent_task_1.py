@@ -227,7 +227,7 @@ class ManagerAgent(Agent):
             else:
                 display_message(self.aid.localname, 'Could`nt create a ticket, error: {}'.format(error))
 
-            if self.tickets < self.number_of_tickets:
+            if  len(self.tickets) < self.number_of_tickets:
                 self.react_create_ticket_list()
             else:
                 display_message(self.aid.localname, 'created {} number of ticket, tickets: {}'.format(self.number_of_tickets, self.tickets))
