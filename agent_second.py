@@ -245,7 +245,7 @@ class ManagerAgent(Agent):
             for ticket in self.tickets:
                 q_aid = copy(AID(ticket['aid_name']))
                 if ticket['is_within']:
-                   call_later(1.0, self.send_command_notify, q_aid )
+                    call_later(1.0, self.send_command_notify, q_aid )
                 else:
                     call_later(1.0, self.send_command_remake, q_aid)
             self.tickets = []
