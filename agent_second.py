@@ -29,7 +29,7 @@ class QuestionAgent(Agent):
 
     def react(self, message):
         super(QuestionAgent, self).react(message)
-        if message.performative == ACLMessage.INFORM and 'ticket' in str(message.sender):
+        if message.performative == ACLMessage.INFORM and 'ticket' in str(message.sender.name):
             display_message(self.aid.name, 'Received message from ticket {}'.format(str(message.sender.name)))
             self.send_ticket_agent_question(message.sender)
 
@@ -59,8 +59,7 @@ class TicketAgent(Agent):
             if message.sender == MANAGER_AID:
                 self.is_running = True
                 self.send_get_new_question()
-            display_message(self.aid.localname, '{} is in {}, name: {}'.format(str(message.sender), 'question' in str(message.sender), message.sender.name))
-            if 'question' in  str(message.sender):
+            if 'manager' in  str(message.sendername):
                 self.questions.append(json.loads(message.content))
                 display_message(self.aid.name, 'Received question from question agent, questions: {}'.format(self.questions))
 
