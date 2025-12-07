@@ -76,12 +76,12 @@ class TicketAgent(Agent):
 
             elif 'ticket' in str(message.sender.name):
                 self.handle_receive_ticket_agent_notif(message)
-                
+
     def handle_receive_ticket_agent_notif(self, message):
-        diff = int(message.content)
+        diff = float(message.content)
         self.all_diffs.append(diff)
         if len(self.all_diffs) == len(self.ticket_agents_aids):
-            
+
             display_message(self.aid.name, 'Received mid diff from ticket agent: {}, my mid diff: {}'.format(sum(self.all_diffs) / len(self.all_diffs), self.calc_mid_diff() ))
 
     def set_new_question(self, new_question):
@@ -118,10 +118,10 @@ class TicketAgent(Agent):
             message.add_receiver(ticket_agent)
             display_message(self.aid.name, 'Sending message to {}'.format(str(ticket_agent.name)))
 
-  
+
             message.set_content(str(self.calc_mid_diff()))
             self.send(message)
-    
+
     def calc_mid_diff(self):
         mid_diff = 0
         for a_question in self.questions:
