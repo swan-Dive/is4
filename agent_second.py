@@ -1,6 +1,7 @@
 import json
 import random
 import secrets
+from copy import copy
 
 from pade.acl.aid import AID
 from pade.acl.messages import ACLMessage
@@ -47,7 +48,7 @@ class TicketAgent(Agent):
     def on_start(self):
         super(TicketAgent, self).on_start()
         display_message(self.aid.name, 'Ticket Agent started.')
-        self.call_later(30.0, self.send_message)
+        # self.call_later(10.0, self.send_get_new_question)
 
     def react(self, message):
         super(TicketAgent, self).react(message)
@@ -59,8 +60,8 @@ class TicketAgent(Agent):
             if 'question' in  str(message.sender.name):
                 self.questions.append(json.loads(message.content))
                 display_message(self.aid.name, 'Received question from question agent, questions: {}'.format(self.questions))
-                
-        
+
+
     def send_get_new_question(self):
         message = ACLMessage(ACLMessage.INFORM)
         ch = secrets.choice(self.current_question_aids)
@@ -76,11 +77,9 @@ class TicketAgent(Agent):
 
 
 class ManagerAgent(Agent):
-    def __init__(self, aid: AID, questions):
+    def __init__(self, aid: AID, ticket_agents):
         super(ManagerAgent, self).__init__(aid)
-        self.questions = questions
-        self.number_of_tickets = 0
-        self.number_of_questions = 0
+        self.ticket_agents = ticket_agents
 
     def on_start(self):
         super(ManagerAgent, self).on_start()
@@ -96,14 +95,26 @@ class ManagerAgent(Agent):
             number_of_questions = content.get('number_of_questions', None)
 
             if number_of_tickets is not None and number_of_questions is not None:
-                self.number_of_tickets = number_of_tickets
-                self.number_of_questions = number_of_questions
-                self.react_create_ticket_list()
+
+                self.react_create_ticket_list(number_of_tickets, number_of_questions)
 
 
 
-    def react_create_ticket_list(self):
-        pass
+    def react_create_ticket_list(self, number_of_tickets, number_of_questions):
+        c_ticket_agents = copy(self.ticket_agents)
+
+        for i in number_of_tickets:
+            new_ticket_agent = secrets.choice(c_ticket_agents)
+            c_ticket_agents.remove(new_ticket_agent)
+
+            message = ACLMessage(ACLMessage.INFORM)
+            message.add_receiver(new_ticket_agent)
+            display_message(self.aid.name, 'Sending message to {}'.format(str(new_ticket_agent.name)))
+            message.set_content(json.dumps({
+                "number_of_questions": number_of_questions,
+            }))
+            self.send(message)
+
 
 class ComportTemporal(TimedBehaviour):
     def __init__(self, agent, time, send_message):
@@ -132,7 +143,7 @@ class StarterAgent(Agent):
         message = ACLMessage(ACLMessage.INFORM)
         message.add_receiver(MANAGER_AID)
         message.set_content(json.dumps({
-            "number_of_questions": random.randint(2,5),
+            "number_of_questions": 4,
             "number_of_tickets": 10
         }))
         self.send(message)
@@ -145,23 +156,29 @@ if __name__ == '__main__':
         "field": secrets.choice(fields)
     } for i in range(0, 100)]
 
-    m_agent = ManagerAgent(MANAGER_AID, questions=gen_questions)
-    s_agent = StarterAgent(STARTER_AID)
+
 
     question_agents_aids = list()
-    agents = [m_agent, s_agent]
+    ticket_agents_aids = list()
+    agents = []
     for index, question in enumerate(gen_questions):
         port = 60000 + index
         aid = AID('question_{}@localhost:{}'.format(port, port))
         agent = QuestionAgent(question=question, aid=aid)
         question_agents_aids.append(aid)
         agents.append(agent)
-
+    
     for i in range(100):
         port = 61000 + i
         aid = AID('ticket_{}@localhost:{}'.format(port, port))
         agent = TicketAgent(aid=aid, question_agents_aids=question_agents_aids)
         agents.append(agent)
-
+        ticket_agents_aids.append(agent)
+    
+    m_agent = ManagerAgent(MANAGER_AID, ticket_agents=ticket_agents_aids)
+    s_agent = StarterAgent(STARTER_AID)
+    agents.append(m_agent)
+    agents.append(s_agent)
+    
     start_loop(agents)
 
