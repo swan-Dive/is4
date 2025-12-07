@@ -186,7 +186,7 @@ class ManagerAgent(Agent):
         match = re.search(r':content\s*"([^"]*)"', str(message))
         if not match:
             return
-        result = match.group(0)
+        result = str(match.group(1))
         display_message(self.aid.localname, 'Received message from starter: {}'.format(result))
 
         if 'number_of_questions' in result:
