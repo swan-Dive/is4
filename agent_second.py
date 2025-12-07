@@ -110,6 +110,7 @@ class TicketAgent(Agent):
                 'questions': self.questions,
                 'aid_name': self.aid.name
             }
+            display_message(self.aid.name, 'Sending done message to manager, content: {}'.format(json.dumps(ans_message_content)))
             ans_message = ACLMessage(ACLMessage.INFORM)
             ans_message.add_receiver(MANAGER_AID)
             ans_message.set_content(json.dumps(ans_message_content))
@@ -149,9 +150,6 @@ class TicketAgent(Agent):
         for ticket_agent in self.ticket_agents_aids:
             message = ACLMessage(ACLMessage.INFORM)
             message.add_receiver(ticket_agent)
-            display_message(self.aid.name, 'Sending message to {}'.format(str(ticket_agent.name)))
-
-
             message.set_content(str(self.calc_mid_diff()))
             self.send(message)
 
@@ -222,7 +220,7 @@ class ManagerAgent(Agent):
             if all_within:
                 display_message(self.aid.name, 'ALL WITHIN')
                 return
-            
+
             for ticket in self.tickets:
                 if ticket['is_within']:
                     self.send_command_notify(AID(ticket['aid_name']))
