@@ -183,7 +183,7 @@ class ManagerAgent(Agent):
             super(ManagerAgent, self).react(dummy_message)
         except Exception as e:
             pass
-        match = re.search(r':content\s*"([^"]*)"', str(message))
+        match = re.search(r':content\s*"(.+)"', str(message))
         if not match:
             return
         result = str(match.group(1))
