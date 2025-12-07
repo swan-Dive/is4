@@ -28,7 +28,7 @@ class QuestionAgent(Agent):
 
     def react(self, message):
         super(QuestionAgent, self).react(message)
-        if message.performative == ACLMessage.INFORM:
+        if message.performative == ACLMessage.INFORM and "ticket" in str(message.sender):
             display_message(self.aid, 'Received message from ticket {}'.format(str(message.sender)))
 
 
@@ -89,23 +89,7 @@ class ManagerAgent(Agent):
 
 
     def react_create_ticket_list(self):
-        question_agents_aids = []
-        agents = []
-        for index, question in enumerate(self.questions):
-            aid = AID('question@localhost:{}'.format(53000 + index))
-            agent = QuestionAgent(question=question, aid=aid)
-            question_agents_aids.append(aid)
-            agents.append(agent)
-
-
-        for i in range(self.number_of_tickets):
-            aid = AID('ticket@localhost:{}'.format(54000 + i))
-            agent = TicketAgent(aid=aid, question_agents_aids=question_agents_aids)
-            agents.append(agent)
-        try:
-            start_loop(agents)
-        except Exception as e:
-            pass
+        pass
 
 class ComportTemporal(TimedBehaviour):
     def __init__(self, agent, time, send_message):
@@ -149,4 +133,19 @@ if __name__ == '__main__':
 
     m_agent = ManagerAgent(MANAGER_AID, questions=gen_questions)
     s_agent = StarterAgent(STARTER_AID)
-    start_loop([s_agent, m_agent])
+    
+    question_agents_aids = []
+    agents = [m_agent, s_agent]
+    for index, question in enumerate(gen_questions):
+        aid = AID('question@localhost:{}'.format(53000 + index))
+        agent = QuestionAgent(question=question, aid=aid)
+        question_agents_aids.append(aid)
+        agents.append(agent)
+
+    for i in range(100):
+        aid = AID('ticket@localhost:{}'.format(54000 + i))
+        agent = TicketAgent(aid=aid, question_agents_aids=question_agents_aids)
+        agents.append(agent)
+        
+    start_loop(agents)
+
