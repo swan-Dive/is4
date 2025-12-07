@@ -29,7 +29,7 @@ class QuestionAgent(Agent):
     def react(self, message):
         super(QuestionAgent, self).react(message)
         if message.performative == ACLMessage.INFORM:
-            display_message(self.aid, 'Received message from ticket manager')
+            display_message(self.aid, 'Received message from ticket {}'.format(str(message.sender)))
 
 
 
