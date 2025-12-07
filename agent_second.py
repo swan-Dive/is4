@@ -78,6 +78,8 @@ class TicketAgent(Agent):
             if 'manager' in str(message.sender.name):
                 content = json.loads(message.content)
                 command = content['command']
+                display_message(self.aid.name, 'Received command: {}'.format(command))
+
                 if command == 'run':
                     if self.is_running:
                         display_message(self.aid.name, 'Already running questions creation')
@@ -209,7 +211,7 @@ class ManagerAgent(Agent):
     def handle_ticket_message(self, message):
         content = json.loads(message.content)
         self.tickets.append(content)
-
+        display_message(self.aid.name, 'Received content: {}'.format(message.content))
         if len(self.tickets) == self.number_of_tickets:
             all_within = True
             for ticket in self.tickets:
