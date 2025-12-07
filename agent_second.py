@@ -112,8 +112,11 @@ class TicketAgent(Agent):
                 self.handle_receive_ticket_agent_notif(message)
 
     def handle_receive_ticket_agent_notif(self, message):
+        if not self.is_running:
+            return
         diff = float(message.content)
         self.all_diffs.append(diff)
+        
         if len(self.all_diffs) == self.number_of_tickets - 1:
             is_within = within_20_percent(sum(self.all_diffs) / len(self.all_diffs), self.calc_mid_diff())
             ans_message_content = {
