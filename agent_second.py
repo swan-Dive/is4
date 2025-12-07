@@ -13,8 +13,8 @@ fields = ['Теоретическая информатика', "Техничес
           'Анализ данных и визуализация']
 
 difficulties = [1,2,3,4,5]
-STARTER_AID = AID('starter@localhost:52000')
-MANAGER_AID = AID('manager@localhost:52001')
+STARTER_AID = AID('starter@localhost:59000')
+MANAGER_AID = AID('manager@localhost:59001')
 
 
 class QuestionAgent(Agent):
@@ -137,13 +137,13 @@ if __name__ == '__main__':
     question_agents_aids = []
     agents = [m_agent, s_agent]
     for index, question in enumerate(gen_questions):
-        aid = AID('question@localhost:{}'.format(53000 + index))
+        aid = AID('question@localhost:{}'.format(60000 + index))
         agent = QuestionAgent(question=question, aid=aid)
         question_agents_aids.append(aid)
         agents.append(agent)
 
     for i in range(100):
-        aid = AID('ticket@localhost:{}'.format(54000 + i))
+        aid = AID('ticket@localhost:{}'.format(61000 + i))
         agent = TicketAgent(aid=aid, question_agents_aids=question_agents_aids)
         agents.append(agent)
 
