@@ -137,7 +137,7 @@ class StarterAgent(Agent):
     def on_start(self):
         super(StarterAgent, self).on_start()
         display_message(self.aid.localname, 'Starter Agent started.')
-        # call_later(10.0, self.send_message)
+        call_later(10.0, self.send_message)
 
     def send_message(self):
         message = ACLMessage(ACLMessage.INFORM)
