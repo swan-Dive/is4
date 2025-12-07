@@ -88,7 +88,7 @@ class TicketAgent(Agent):
                     if self.is_running:
                         display_message(self.aid.name, 'Already running questions creation')
                         return
-                    self.current_question_aids = copy(self.ticket_agents_aids)
+                    # self.current_question_aids = copy(self.ticket_agents_aids)
                     self.is_running = True
                     # self.questions = []
                     # self.all_diffs = []
