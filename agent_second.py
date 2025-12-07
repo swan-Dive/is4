@@ -75,7 +75,8 @@ class TicketAgent(Agent):
     def react(self, message):
         super(TicketAgent, self).react(message)
         if message.performative == ACLMessage.INFORM:
-            display_message(self.aid.name, 'Received message from {}'.format(message.sender.name))
+            if 'ams' not in message.sender.name:
+                display_message(self.aid.name, 'Received message from {}'.format(message.sender.name))
 
             if 'manager' in str(message.sender.name):
                 content = json.loads(message.content)
@@ -83,7 +84,7 @@ class TicketAgent(Agent):
                 display_message(self.aid.name, 'Received command: {}'.format(command))
 
                 if command == 'run':
-                    
+
                     if self.is_running:
                         display_message(self.aid.name, 'Already running questions creation')
                         return
