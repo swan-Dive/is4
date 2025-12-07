@@ -173,7 +173,7 @@ if __name__ == '__main__':
         aid = AID('ticket_{}@localhost:{}'.format(port, port))
         agent = TicketAgent(aid=aid, question_agents_aids=question_agents_aids)
         agents.append(agent)
-        ticket_agents_aids.append(agent)
+        ticket_agents_aids.append(aid)
 
     m_agent = ManagerAgent(MANAGER_AID, ticket_agents=ticket_agents_aids)
     s_agent = StarterAgent(STARTER_AID)
