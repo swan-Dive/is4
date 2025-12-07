@@ -49,6 +49,7 @@ class TicketAgent(Agent):
         self.current_question_aids = question_agents_aids
         self.ticket_agents_aids = copy(ticket_agent_aids)
         self.number_of_questions = 0
+        self.number_of_tickets=  0
         self.all_diffs = []
         self.is_running = False
 
@@ -69,6 +70,7 @@ class TicketAgent(Agent):
                     return
                 self.is_running = True
                 self.number_of_questions = json.loads(message.content)['number_of_questions']
+                self.number_of_tickets = json.loads(message.content)['number_of_tickets']
                 self.send_get_new_question()
             elif 'question' in  str(message.sender.name):
                 self.set_new_question(json.loads(message.content))
@@ -81,7 +83,6 @@ class TicketAgent(Agent):
         diff = float(message.content)
         self.all_diffs.append(diff)
         if len(self.all_diffs) == len(self.ticket_agents_aids):
-
             display_message(self.aid.name, 'Received mid diff from ticket agent: {}, my mid diff: {}'.format(sum(self.all_diffs) / len(self.all_diffs), self.calc_mid_diff() ))
 
     def set_new_question(self, new_question):
@@ -165,6 +166,7 @@ class ManagerAgent(Agent):
             display_message(self.aid.name, 'Sending message to {}'.format(str(new_ticket_agent.name)))
             message.set_content(json.dumps({
                 "number_of_questions": number_of_questions,
+                "number_of_tickets": number_of_tickets
             }))
             self.send(message)
 
