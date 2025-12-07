@@ -187,7 +187,7 @@ class ManagerAgent(Agent):
         if match:
             result = match.group(0)
             display_message(self.aid.localname, 'Received message from starter: {}, {}'.format(result, message))
-        display_message(self.aid.localname, 'Received message from starter: {}'.format('content' in str(message)))
+        display_message(self.aid.localname, 'Received message from starter: {}'.format(str(message)))
 
         if message.performative == ACLMessage.INFORM and 'number_of_questions' in message.content:
             display_message(self.aid.localname, 'Received message from starter: {}'.format(message.content) )
