@@ -28,7 +28,7 @@ class QuestionAgent(Agent):
 
     def react(self, message):
         super(QuestionAgent, self).react(message)
-        if message.performative == ACLMessage.INFORM and "ticket" in str(message.sender):
+        if message.performative == ACLMessage.INFORM:
             display_message(self.aid, 'Received message from ticket {}'.format(str(message.sender)))
 
 
@@ -133,7 +133,7 @@ if __name__ == '__main__':
 
     m_agent = ManagerAgent(MANAGER_AID, questions=gen_questions)
     s_agent = StarterAgent(STARTER_AID)
-    
+
     question_agents_aids = []
     agents = [m_agent, s_agent]
     for index, question in enumerate(gen_questions):
@@ -146,6 +146,6 @@ if __name__ == '__main__':
         aid = AID('ticket@localhost:{}'.format(54000 + i))
         agent = TicketAgent(aid=aid, question_agents_aids=question_agents_aids)
         agents.append(agent)
-        
+
     start_loop(agents)
 
