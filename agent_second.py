@@ -74,7 +74,7 @@ class TicketAgent(Agent):
 
     def react(self, message):
         super(TicketAgent, self).react(message)
-
+        display_message(self.aid.name, 'Received command: ')
         if message.performative == ACLMessage.INFORM:
             if 'manager' in str(message.sender.name):
                 content = json.loads(message.content)
@@ -304,8 +304,6 @@ if __name__ == '__main__':
         "field": secrets.choice(fields)
     } for i in range(0, 100)]
 
-
-
     question_agents_aids = list()
     ticket_agents_aids = list()
     agents = []
@@ -329,6 +327,7 @@ if __name__ == '__main__':
     m_agent = ManagerAgent(MANAGER_AID, ticket_agents=ticket_agents_aids)
     # s_agent = StarterAgent(STARTER_AID)
     agents.append(m_agent)
+
     # agents.append(s_agent)
 
     start_loop(agents)
