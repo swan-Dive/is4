@@ -80,14 +80,14 @@ class ManagerAgent(Agent):
     #         content = json.loads(message.content)
     #         number_of_tickets = content.get('number_of_tickets', None)
     #         number_of_questions = content.get('number_of_questions', None)
-    # 
+    #
     #         if number_of_tickets is not None and number_of_questions is not None:
     #             self.number_of_tickets = number_of_tickets
     #             self.number_of_questions = number_of_questions
     #             self.react_create_ticket_list()
-    # 
-    # 
-    # 
+    #
+    #
+    #
     # def react_create_ticket_list(self):
     #     pass
 
@@ -137,13 +137,15 @@ if __name__ == '__main__':
     question_agents_aids = list()
     agents = [m_agent, s_agent]
     for index, question in enumerate(gen_questions):
-        aid = AID('question@localhost:{}'.format(60000 + index))
+        port = 60000 + index
+        aid = AID('question_{}@localhost:{}'.format(port, port))
         agent = QuestionAgent(question=question, aid=aid)
         question_agents_aids.append(aid)
         agents.append(agent)
 
     for i in range(100):
-        aid = AID('ticket@localhost:{}'.format(61000 + i))
+        port = 61000 + i
+        aid = AID('ticket_{}@localhost:{}'.format(port, port))
         agent = TicketAgent(aid=aid, question_agents_aids=question_agents_aids)
         agents.append(agent)
 
