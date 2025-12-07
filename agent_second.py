@@ -48,6 +48,7 @@ class TicketAgent(Agent):
         self.question_agents_aids = question_agents_aids
         self.current_question_aids = question_agents_aids
         self.ticket_agents_aids = copy(ticket_agent_aids)
+        self.number_of_questions = 0
         self.is_running = False
 
     def on_start(self):
@@ -62,16 +63,35 @@ class TicketAgent(Agent):
 
         if message.performative == ACLMessage.INFORM:
             if 'manager' in str(message.sender.name):
+                if self.is_running == True:
+                    display_message(self.aid.name, 'Already running questions creation')
+                    return
                 self.is_running = True
+                self.number_of_questions = json.loads(message.content)['number_of_questions']
                 self.send_get_new_question()
             elif 'question' in  str(message.sender.name):
-                self.questions.append(json.loads(message.content))
+                self.set_new_question(json.loads(message.content))
                 display_message(self.aid.name, 'Received question from question agent, questions: {}'.format(self.questions))
-                self.inform_other_ticket_agents()
+       
             elif 'ticket' in str(message.sender.name):
                 display_message(self.aid.name, 'Received mid diff from ticket agent')
 
-
+    def set_new_question(self, new_question):
+        if len(self.questions) < self.number_of_questions:
+                
+            found_existing_field = False
+            for q in  self.questions:
+                if q['field'] == new_question['field']:
+                    found_existing_field = True
+                    break
+            if not found_existing_field:
+                self.questions.append(new_question)
+            
+        if len(self.questions) == self.number_of_questions:
+            self.inform_other_ticket_agents()
+        else:
+            self.send_get_new_question()
+        
     def send_get_new_question(self):
         message = ACLMessage(ACLMessage.INFORM)
         ch = secrets.choice(self.current_question_aids)
