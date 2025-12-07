@@ -49,6 +49,7 @@ class TicketAgent(Agent):
         self.current_question_aids = question_agents_aids
         self.ticket_agents_aids = copy(ticket_agent_aids)
         self.number_of_questions = 0
+        self.all_diffs = []
         self.is_running = False
 
     def on_start(self):
@@ -72,13 +73,20 @@ class TicketAgent(Agent):
             elif 'question' in  str(message.sender.name):
                 self.set_new_question(json.loads(message.content))
                 display_message(self.aid.name, 'Received question from question agent, questions: {}'.format(self.questions))
-       
+
             elif 'ticket' in str(message.sender.name):
-                display_message(self.aid.name, 'Received mid diff from ticket agent')
+                self.handle_receive_ticket_agent_notif(message)
+                
+    def handle_receive_ticket_agent_notif(self, message):
+        diff = int(message.content)
+        self.all_diffs.append(diff)
+        if len(self.all_diffs) == len(self.ticket_agents_aids):
+            
+            display_message(self.aid.name, 'Received mid diff from ticket agent: {}, my mid diff: {}'.format(sum(self.all_diffs) / len(self.all_diffs), self.calc_mid_diff() ))
 
     def set_new_question(self, new_question):
         if len(self.questions) < self.number_of_questions:
-                
+
             found_existing_field = False
             for q in  self.questions:
                 if q['field'] == new_question['field']:
@@ -86,12 +94,12 @@ class TicketAgent(Agent):
                     break
             if not found_existing_field:
                 self.questions.append(new_question)
-            
+
         if len(self.questions) == self.number_of_questions:
             self.inform_other_ticket_agents()
         else:
             self.send_get_new_question()
-        
+
     def send_get_new_question(self):
         message = ACLMessage(ACLMessage.INFORM)
         ch = secrets.choice(self.current_question_aids)
@@ -110,12 +118,16 @@ class TicketAgent(Agent):
             message.add_receiver(ticket_agent)
             display_message(self.aid.name, 'Sending message to {}'.format(str(ticket_agent.name)))
 
-            mid_diff = 0
-            for a_question in self.questions:
-                mid_diff += int(a_question.get('diff', 0))
-            mid_diff = mid_diff / len(self.questions)
-            message.set_content(str(mid_diff))
+  
+            message.set_content(str(self.calc_mid_diff()))
             self.send(message)
+    
+    def calc_mid_diff(self):
+        mid_diff = 0
+        for a_question in self.questions:
+            mid_diff += int(a_question.get('diff', 0))
+        mid_diff = mid_diff / len(self.questions) if len(self.questions) != 0 else 0
+        return mid_diff
 
 class ManagerAgent(Agent):
     def __init__(self, aid: AID, ticket_agents):
