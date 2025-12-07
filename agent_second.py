@@ -31,7 +31,7 @@ class QuestionAgent(Agent):
         if message.performative == ACLMessage.INFORM:
             display_message(self.aid.localname, 'Received message from ticket manager')
 
-            
+
 
 
 class TicketAgent(Agent):
@@ -39,6 +39,8 @@ class TicketAgent(Agent):
         super(TicketAgent, self).__init__(aid)
         self.info = {}
         self.question_agents_aids = question_agents_aids
+        comp_temp = ComportTemporal(self,  15.0, self.send_message)
+        self.behaviours.append(comp_temp)
 
     def on_start(self):
         super(TicketAgent, self).on_start()
@@ -46,7 +48,16 @@ class TicketAgent(Agent):
 
     def react(self, message):
         super(TicketAgent, self).react(message)
-        
+
+    def send_message(self):
+        message = ACLMessage(ACLMessage.INFORM)
+        message.add_receiver(self.question_agents_aids[0])
+        message.set_content(json.dumps({
+            "number_of_questions": random.randint(2,5),
+            "number_of_tickets": 10
+        }))
+        self.send(message)
+
 
 
 class ManagerAgent(Agent):
@@ -84,13 +95,16 @@ class ManagerAgent(Agent):
             agent = QuestionAgent(question=question, aid=aid)
             question_agents_aids.append(aid)
             agents.append(agent)
-        
-        
+
+
         for i in range(self.number_of_tickets):
             aid = AID('ticket@localhost:{}'.format(54000 + i))
             agent = TicketAgent(aid=aid, question_agents_aids=question_agents_aids)
             agents.append(agent)
-        start_loop(agents)
+        try:
+            start_loop(agents)
+        except Exception as e:
+            pass
 
 class ComportTemporal(TimedBehaviour):
     def __init__(self, agent, time, send_message):
@@ -135,4 +149,3 @@ if __name__ == '__main__':
     m_agent = ManagerAgent(MANAGER_AID, questions=gen_questions)
     s_agent = StarterAgent(STARTER_AID)
     start_loop([s_agent, m_agent])
-    
