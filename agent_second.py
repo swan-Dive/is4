@@ -42,7 +42,7 @@ class TicketAgent(Agent):
 
     def on_start(self):
         super(TicketAgent, self).on_start()
-        display_message(self.aid.localname, 'Ticket Agent started.')
+        display_message(self.aid.name, 'Ticket Agent started.')
         self.call_later(10.0, self.send_message)
 
     def react(self, message):
@@ -52,7 +52,7 @@ class TicketAgent(Agent):
         message = ACLMessage(ACLMessage.INFORM)
         ch = secrets.choice(self.question_agents_aids)
         message.add_receiver(secrets.choice(self.question_agents_aids))
-        display_message(self.aid.localname, 'Sending message to {}'.format(str(ch)))
+        display_message(self.aid.name, 'Sending message to {}'.format(str(ch.name)))
         message.set_content(json.dumps({
             "number_of_questions": random.randint(2,5),
             "number_of_tickets": 10
