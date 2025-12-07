@@ -184,9 +184,9 @@ class ManagerAgent(Agent):
             pass
         match = re.search(r':content\s*"([^"]*)"', str(message))
         if match:
-            result = match.group(1)
-            display_message(self.aid.localname, 'Received message from starter: {}'.format(result))
-        display_message(self.aid.name, str(message))
+            result = match.group(0)
+            display_message(self.aid.localname, 'Received message from starter: {}, {}'.format(result, message))
+  
         if message.performative == ACLMessage.INFORM and 'number_of_questions' in message.content:
             display_message(self.aid.localname, 'Received message from starter: {}'.format(message.content) )
             content = json.loads(message.content)
