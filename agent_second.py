@@ -189,7 +189,7 @@ class ManagerAgent(Agent):
         result = match.group(0)
 
 
-        if message.performative == ACLMessage.INFORM and 'number_of_questions' in result:
+        if 'number_of_questions' in result:
             display_message(self.aid.localname, 'Received message from starter: {}'.format(result) )
             content = json.loads(result)
             number_of_tickets = content.get('number_of_tickets', None)
