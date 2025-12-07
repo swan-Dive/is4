@@ -103,7 +103,7 @@ class ManagerAgent(Agent):
     def react_create_ticket_list(self, number_of_tickets, number_of_questions):
         c_ticket_agents = copy(self.ticket_agents)
 
-        for i in number_of_tickets:
+        for i in range(number_of_tickets):
             new_ticket_agent = secrets.choice(c_ticket_agents)
             c_ticket_agents.remove(new_ticket_agent)
 
