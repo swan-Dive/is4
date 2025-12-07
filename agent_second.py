@@ -178,8 +178,10 @@ class ManagerAgent(Agent):
         display_message(self.aid.localname, 'Manager Agent started.')
 
     def react(self, message):
-        dummy_m = ACLMessage(ACLMessage.INFORM)
-        super(ManagerAgent, self).react(dummy_m)
+        try:
+            super(ManagerAgent, self).react(message)
+        except Exception as e:
+            pass
         match = re.search(r':content\s*"([^"]*)"', message)
         if match:
             result = match.group(1)
