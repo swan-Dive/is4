@@ -178,15 +178,15 @@ class ManagerAgent(Agent):
         display_message(self.aid.localname, 'Manager Agent started.')
 
     def react(self, message):
-        dummy_message = ACLMessage(ACLMessage.INFORM)
-        try:
-            super(ManagerAgent, self).react(dummy_message)
-        except Exception as e:
-            pass
-        match = re.search(r':content\s*"([^"]*)"', str(message))
-        if match:
-            result = match.group(0)
-            display_message(self.aid.localname, 'Received message from starter: {}, {}'.format(result, message))
+        # dummy_message = ACLMessage(ACLMessage.INFORM)
+        # try:
+        #     super(ManagerAgent, self).react(dummy_message)
+        # except Exception as e:
+        #     pass
+        # match = re.search(r':content\s*"([^"]*)"', str(message))
+        # if match:
+        #     result = match.group(0)
+        #     display_message(self.aid.localname, 'Received message from starter: {}, {}'.format(result, message))
         display_message(self.aid.localname, 'Received message from starter: {}'.format(str(message)))
 
         if message.performative == ACLMessage.INFORM and 'number_of_questions' in message.content:
