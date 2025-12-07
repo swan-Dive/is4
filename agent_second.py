@@ -61,6 +61,7 @@ class TicketAgent(Agent):
         super(TicketAgent, self).react(message)
 
         if message.performative == ACLMessage.INFORM:
+            display_message(self.aid.localname, 'message from:{}'.format(str(message.sender.name)))
             if 'manager' in str(message.sender.name):
                 self.is_running = True
                 self.send_get_new_question()
@@ -88,6 +89,8 @@ class TicketAgent(Agent):
         for ticket_agent in self.ticket_agents_aids:
             message = ACLMessage(ACLMessage.INFORM)
             message.add_receiver(ticket_agent)
+            display_message(self.aid.name, 'Sending message to {}'.format(str(ticket_agent.name)))
+
             mid_diff = 0
             for a_question in self.questions:
                 mid_diff += int(a_question.get('diff', 0))
