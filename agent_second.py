@@ -47,10 +47,8 @@ class TicketAgent(Agent):
         self.questions = []
         self.question_agents_aids = question_agents_aids
         self.current_question_aids = question_agents_aids
-        self.ticket_agents_aids = ticket_agent_aids
+        self.ticket_agents_aids = copy(ticket_agent_aids)
         self.is_running = False
-
-
 
     def on_start(self):
         super(TicketAgent, self).on_start()
@@ -73,7 +71,7 @@ class TicketAgent(Agent):
             if 'ticket' in str(message.sender.name):
                 display_message(self.aid.name, 'Received mid diff from ticket agent')
 
-    
+
     def send_get_new_question(self):
         message = ACLMessage(ACLMessage.INFORM)
         ch = secrets.choice(self.current_question_aids)
