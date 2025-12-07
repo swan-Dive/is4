@@ -240,6 +240,7 @@ class ManagerAgent(Agent):
 
             if all_within:
                 display_message(self.aid.name, 'ALL WITHIN')
+                self.tickets = []
                 return
 
             for ticket in self.tickets:
