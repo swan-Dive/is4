@@ -6,7 +6,7 @@ from pade.acl.aid import AID
 from pade.acl.messages import ACLMessage
 from pade.behaviours.protocols import TimedBehaviour
 from pade.core.agent import Agent
-from pade.misc.utility import display_message, start_loop
+from pade.misc.utility import display_message, start_loop, call_later
 
 fields = ['Теоретическая информатика', "Техническая информатика", 'Прикладная информатика', 'Информационные системы',
           'Компьютерные сети и телекоммуникации', 'Базы данных', 'Информационная безопасность и кибербезопасность',
@@ -39,19 +39,18 @@ class TicketAgent(Agent):
         super(TicketAgent, self).__init__(aid)
         self.info = {}
         self.question_agents_aids = question_agents_aids
-        comp_temp = ComportTemporal(self,  15.0, self.send_message)
-        self.behaviours.append(comp_temp)
 
     def on_start(self):
         super(TicketAgent, self).on_start()
         display_message(self.aid.localname, 'Ticket Agent started.')
+        self.call_later(4.0, self.send_message())
 
     def react(self, message):
         super(TicketAgent, self).react(message)
 
     def send_message(self):
         message = ACLMessage(ACLMessage.INFORM)
-        message.add_receiver(self.question_agents_aids[0])
+        message.add_receiver(secrets.choice(self.question_agents_aids))
         message.set_content(json.dumps({
             "number_of_questions": random.randint(2,5),
             "number_of_tickets": 10
@@ -120,14 +119,14 @@ class ComportTemporal(TimedBehaviour):
 class StarterAgent(Agent):
     def __init__(self, aid: AID):
         super(StarterAgent, self).__init__(aid)
-        comp_temp = ComportTemporal(self,  15.0, self.send_message)
-        self.behaviours.append(comp_temp)
+        # comp_temp = ComportTemporal(self,  15.0, self.send_message)
+        # self.behaviours.append(comp_temp)
 
 
     def on_start(self):
         super(StarterAgent, self).on_start()
         display_message(self.aid.localname, 'Starter Agent started.')
-        # call_later(4.0, self.send_message)
+        call_later(4.0, self.send_message)
 
     def send_message(self):
         message = ACLMessage(ACLMessage.INFORM)
