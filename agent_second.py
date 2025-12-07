@@ -31,11 +31,13 @@ class QuestionAgent(Agent):
         super(QuestionAgent, self).react(message)
         if message.performative == ACLMessage.INFORM and 'ticket' in str(message.sender.name):
             display_message(self.aid.name, 'Received message from ticket {}'.format(str(message.sender.name)))
-            message = ACLMessage(ACLMessage.INFORM)
-            message.add_receiver(AID(message.sender.name))
-            message.set_content(json.dumps(str(self.question)))
-            self.send(message)
-
+            self.send_ticket_agent_question(message.sender)
+            
+    def send_ticket_agent_question(self, ticket_aid):
+        ans_message = ACLMessage(ACLMessage.INFORM)
+        ans_message.add_receiver(ticket_aid)
+        ans_message.set_content(json.dumps(str(self.question)))
+        self.send(ans_message)
 
 class TicketAgent(Agent):
     def __init__(self, aid: AID, question_agents_aids):
