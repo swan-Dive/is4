@@ -59,9 +59,9 @@ class TicketAgent(Agent):
 
     def react(self, message):
         super(TicketAgent, self).react(message)
+        display_message(self.aid.localname, 'message from:{}'.format(str(message.sender.name)))
 
         if message.performative == ACLMessage.INFORM:
-            display_message(self.aid.localname, 'message from:{}'.format(str(message.sender.name)))
             if 'manager' in str(message.sender.name):
                 self.is_running = True
                 self.send_get_new_question()
