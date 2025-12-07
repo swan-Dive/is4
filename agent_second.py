@@ -64,11 +64,11 @@ class TicketAgent(Agent):
             if 'manager' in str(message.sender.name):
                 self.is_running = True
                 self.send_get_new_question()
-            if 'question' in  str(message.sender.name):
+            elif 'question' in  str(message.sender.name):
                 self.questions.append(json.loads(message.content))
-                self.inform_other_ticket_agents()
                 display_message(self.aid.name, 'Received question from question agent, questions: {}'.format(self.questions))
-            if 'ticket' in str(message.sender.name):
+                self.inform_other_ticket_agents()
+            elif 'ticket' in str(message.sender.name):
                 display_message(self.aid.name, 'Received mid diff from ticket agent')
 
 
