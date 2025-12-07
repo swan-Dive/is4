@@ -222,13 +222,15 @@ class ManagerAgent(Agent):
             if all_within:
                 display_message(self.aid.name, 'ALL WITHIN')
                 return
-
+        
             for ticket in self.tickets:
+                q_aid = copy(ticket['aid_name'])
                 if ticket['is_within']:
-                    self.send_command_notify(AID(ticket['aid_name']))
+                   call_later(5.0, self.send_command_notify, q_aid )
                 else:
-                    self.send_command_remake(AID(ticket['aid_name']))
-
+                    call_later(5.0, self.send_command_remake, q_aid)
+            self.tickets = []
+            
     def send_command_notify(self, ticket_agent_aid):
         message = ACLMessage(ACLMessage.INFORM)
         message.add_receiver(ticket_agent_aid)
