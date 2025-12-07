@@ -116,6 +116,7 @@ class TicketAgent(Agent):
             ans_message = ACLMessage(ACLMessage.INFORM)
             ans_message.add_receiver(MANAGER_AID)
             ans_message.set_content(json.dumps(ans_message_content))
+            self.all_diffs = []
             self.send(ans_message)
 
 
@@ -149,6 +150,7 @@ class TicketAgent(Agent):
         self.send(message)
 
     def inform_other_ticket_agents(self):
+        display_message(self.aid.name, 'informing other agents')
         for ticket_agent in self.ticket_agents_aids:
             message = ACLMessage(ACLMessage.INFORM)
             message.add_receiver(ticket_agent)
