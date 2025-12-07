@@ -182,7 +182,7 @@ class ManagerAgent(Agent):
             super(ManagerAgent, self).react(message)
         except Exception as e:
             pass
-        match = re.search(r':content\s*"([^"]*)"', message)
+        match = re.search(r':content\s*"([^"]*)"', str(message))
         if match:
             result = match.group(1)
             display_message(self.aid.localname, 'Received message from starter: {}'.format(result))
