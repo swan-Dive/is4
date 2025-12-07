@@ -65,7 +65,7 @@ class TicketAgent(Agent):
     def send_get_new_question(self):
         message = ACLMessage(ACLMessage.INFORM)
         ch = secrets.choice(self.current_question_aids)
-        self.current_question_aids.remove(ch)
+        # self.current_question_aids.remove(ch)
         message.add_receiver(ch)
         display_message(self.aid.name, 'Sending message to {}'.format(str(ch.name)))
         message.set_content(json.dumps({
@@ -105,7 +105,7 @@ class ManagerAgent(Agent):
 
         for i in number_of_tickets:
             new_ticket_agent = secrets.choice(c_ticket_agents)
-            c_ticket_agents.remove(new_ticket_agent)
+            # c_ticket_agents.remove(new_ticket_agent)
 
             message = ACLMessage(ACLMessage.INFORM)
             message.add_receiver(new_ticket_agent)
@@ -167,18 +167,18 @@ if __name__ == '__main__':
         agent = QuestionAgent(question=question, aid=aid)
         question_agents_aids.append(aid)
         agents.append(agent)
-    
+
     for i in range(100):
         port = 61000 + i
         aid = AID('ticket_{}@localhost:{}'.format(port, port))
         agent = TicketAgent(aid=aid, question_agents_aids=question_agents_aids)
         agents.append(agent)
         ticket_agents_aids.append(agent)
-    
+
     m_agent = ManagerAgent(MANAGER_AID, ticket_agents=ticket_agents_aids)
     s_agent = StarterAgent(STARTER_AID)
     agents.append(m_agent)
     agents.append(s_agent)
-    
+
     start_loop(agents)
 
