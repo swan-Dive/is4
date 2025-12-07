@@ -38,7 +38,7 @@
 # if __name__ == '__main__':
 #     s_agent = StarterAgent(STARTER_AID)
 #     start_loop([s_agent])
-
+import pickle
 # Source - https://stackoverflow.com/a
 # Posted by AbdulMueed, modified by community. See post 'Timeline' for change history
 # Retrieved 2025-12-07, License - CC BY-SA 3.0
@@ -49,11 +49,14 @@ host = "185.200.178.189"
 port = 59001                   # The same port as used by the server
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((host, port))
-s.sendall(b'(inform '
-          b':conversationID 4f1fce1c-d39a-11f0-a78f-525400150a7e'
-          b' :sender (agent-identifier :name remetente@localhost:50001 :addresses (sequence localhost:50001))'
-          b' :receiver (set (agent-identifier :name manager@185.200.178.189:59001 :addresses (sequence localhost:24059 ) )  )'
-          b' :content "{"number_of_questions": 3, "number_of_tickets": 10}")')
+
+
+
+s.sendall(pickle.dumps('(inform '
+          ':conversationID 4f1fce1c-d39a-11f0-a78f-525400150a7e'
+          ' :sender (agent-identifier :name remetente@localhost:50001 :addresses (sequence localhost:50001))'
+          ' :receiver (set (agent-identifier :name manager@185.200.178.189:59001 :addresses (sequence localhost:24059 ) )  )'
+          ' :content "{"number_of_questions": 3, "number_of_tickets": 10}")'))
 # data = s.recv(1024)
 s.close()
 # print('Received', repr(data))
