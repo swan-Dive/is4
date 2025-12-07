@@ -15,7 +15,7 @@ fields = ['Теоретическая информатика', "Техничес
 
 difficulties = [1,2,3,4,5]
 STARTER_AID = AID('starter@localhost:59000')
-MANAGER_AID = AID('manager@localhost:59001')
+MANAGER_AID = AID('manager@185.200.178.189:59001')
 
 def within_20_percent(a, b):
     """
