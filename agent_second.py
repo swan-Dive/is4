@@ -179,7 +179,7 @@ class ManagerAgent(Agent):
     def react(self, message):
         super(ManagerAgent, self).react(message)
 
-        if message.performative == ACLMessage.INFORM and message.sender == STARTER_AID:
+        if message.performative == ACLMessage.INFORM:
             display_message(self.aid.localname, 'Received message from starter')
             content = json.loads(message.content)
             number_of_tickets = content.get('number_of_tickets', None)
@@ -318,9 +318,9 @@ if __name__ == '__main__':
         agents.append(agent)
 
     m_agent = ManagerAgent(MANAGER_AID, ticket_agents=ticket_agents_aids)
-    s_agent = StarterAgent(STARTER_AID)
+    # s_agent = StarterAgent(STARTER_AID)
     agents.append(m_agent)
-    agents.append(s_agent)
+    # agents.append(s_agent)
 
     start_loop(agents)
 
