@@ -54,8 +54,8 @@ s.connect((host, port))
 
 s.sendall(pickle.dumps('(inform '
           ':conversationID 4f1fce1c-d39a-11f0-a78f-525400150a7e'
-          ' :sender (agent-identifier :name remetente@localhost:50001 :addresses (sequence localhost:50001))'
-          ' :receiver (set (agent-identifier :name manager@185.200.178.189:59001 :addresses (sequence localhost:24059 ) )  )'
+          ' :sender (agent-identifier :name starter@localhost:59000 :addresses (sequence localhost:59000))'
+          ' :receiver (set (agent-identifier :name manager@185.200.178.189:59001 :addresses (sequence manager@185.200.178.189:59001 ) )  )'
           ' :content "{"number_of_questions": 3, "number_of_tickets": 10}")'))
 # data = s.recv(1024)
 s.close()
