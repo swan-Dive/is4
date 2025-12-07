@@ -198,7 +198,7 @@ class ManagerAgent(Agent):
                 self.number_of_questions = number_of_questions
                 self.react_create_ticket_list(number_of_tickets, number_of_questions)
 
-        if message.performative == ACLMessage.INFORM and 'ticket' in  message.sender.name:
+        elif message.performative == ACLMessage.INFORM and 'ticket' in  message.sender.name:
             self.handle_ticket_message(message)
 
 
