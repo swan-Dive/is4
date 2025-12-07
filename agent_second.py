@@ -90,7 +90,7 @@ class TicketAgent(Agent):
             message.add_receiver(ticket_agent)
             mid_diff = 0
             for a_question in self.questions:
-                mid_diff += int(a_question['diff'])
+                mid_diff += int(a_question.get('diff', 0))
             mid_diff = mid_diff / len(self.questions)
             message.set_content(str(mid_diff))
 
