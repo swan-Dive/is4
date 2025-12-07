@@ -50,7 +50,9 @@ class TicketAgent(Agent):
 
     def send_message(self):
         message = ACLMessage(ACLMessage.INFORM)
+        ch = secrets.choice(self.question_agents_aids)
         message.add_receiver(secrets.choice(self.question_agents_aids))
+        display_message(self.aid.localname, 'Sending message to {}'.format(str(ch)))
         message.set_content(json.dumps({
             "number_of_questions": random.randint(2,5),
             "number_of_tickets": 10
