@@ -43,7 +43,7 @@ class TicketAgent(Agent):
     def on_start(self):
         super(TicketAgent, self).on_start()
         display_message(self.aid.name, 'Ticket Agent started.')
-        self.call_later(30.0, self.send_message)
+        self.call_later(10.0, self.send_message)
 
     def react(self, message):
         super(TicketAgent, self).react(message)
@@ -75,21 +75,38 @@ class ManagerAgent(Agent):
     def react(self, message):
         super(ManagerAgent, self).react(message)
 
-    #     if message.performative == ACLMessage.INFORM and message.sender == STARTER_AID:
-    #         display_message(self.aid.localname, 'Received message from starter')
-    #         content = json.loads(message.content)
-    #         number_of_tickets = content.get('number_of_tickets', None)
-    #         number_of_questions = content.get('number_of_questions', None)
-    #
-    #         if number_of_tickets is not None and number_of_questions is not None:
-    #             self.number_of_tickets = number_of_tickets
-    #             self.number_of_questions = number_of_questions
-    #             self.react_create_ticket_list()
-    #
-    #
-    #
-    # def react_create_ticket_list(self):
-    #     pass
+        if message.performative == ACLMessage.INFORM and message.sender == STARTER_AID:
+            display_message(self.aid.localname, 'Received message from starter')
+            content = json.loads(message.content)
+            number_of_tickets = content.get('number_of_tickets', None)
+            number_of_questions = content.get('number_of_questions', None)
+
+            if number_of_tickets is not None and number_of_questions is not None:
+                self.number_of_tickets = number_of_tickets
+                self.number_of_questions = number_of_questions
+                self.react_create_ticket_list()
+
+
+
+    def react_create_ticket_list(self):
+        new_agents = []
+        for index, question in enumerate(gen_questions):
+            port = 60000 + index
+            aid = AID('question_{}@localhost:{}'.format(port, port))
+            agent = QuestionAgent(question=question, aid=aid)
+            question_agents_aids.append(aid)
+            new_agents.append(agent)
+
+        for i in range(100):
+            port = 61000 + i
+            aid = AID('ticket_{}@localhost:{}'.format(port, port))
+            agent = TicketAgent(aid=aid, question_agents_aids=question_agents_aids)
+            new_agents.append(agent)
+        
+        try:
+            start_loop(new_agents)
+        except Exception:
+            pass
 
 class ComportTemporal(TimedBehaviour):
     def __init__(self, agent, time, send_message):
@@ -112,7 +129,7 @@ class StarterAgent(Agent):
     def on_start(self):
         super(StarterAgent, self).on_start()
         display_message(self.aid.localname, 'Starter Agent started.')
-        # call_later(10.0, self.send_message)
+        call_later(10.0, self.send_message)
 
     def send_message(self):
         message = ACLMessage(ACLMessage.INFORM)
@@ -136,18 +153,7 @@ if __name__ == '__main__':
 
     question_agents_aids = list()
     agents = [m_agent, s_agent]
-    for index, question in enumerate(gen_questions):
-        port = 60000 + index
-        aid = AID('question_{}@localhost:{}'.format(port, port))
-        agent = QuestionAgent(question=question, aid=aid)
-        question_agents_aids.append(aid)
-        agents.append(agent)
 
-    for i in range(100):
-        port = 61000 + i
-        aid = AID('ticket_{}@localhost:{}'.format(port, port))
-        agent = TicketAgent(aid=aid, question_agents_aids=question_agents_aids)
-        agents.append(agent)
 
     start_loop(agents)
 
