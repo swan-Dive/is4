@@ -51,7 +51,7 @@ class TicketAgent(Agent):
     def send_message(self):
         message = ACLMessage(ACLMessage.INFORM)
         ch = secrets.choice(self.question_agents_aids)
-        message.add_receiver(secrets.choice(self.question_agents_aids))
+        message.add_receiver(ch)
         display_message(self.aid.name, 'Sending message to {}'.format(str(ch.name)))
         message.set_content(json.dumps({
             "number_of_questions": random.randint(2,5),
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     m_agent = ManagerAgent(MANAGER_AID, questions=gen_questions)
     s_agent = StarterAgent(STARTER_AID)
 
-    question_agents_aids = []
+    question_agents_aids = list()
     agents = [m_agent, s_agent]
     for index, question in enumerate(gen_questions):
         aid = AID('question@localhost:{}'.format(60000 + index))
