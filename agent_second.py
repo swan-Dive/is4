@@ -32,7 +32,7 @@ class QuestionAgent(Agent):
         if message.performative == ACLMessage.INFORM and 'ticket' in str(message.sender.name):
             display_message(self.aid.name, 'Received message from ticket {}'.format(str(message.sender.name)))
             message = ACLMessage(ACLMessage.INFORM)
-            message.add_receiver(message.sender)
+            message.add_receiver(AID(message.sender.name))
             message.set_content(json.dumps(str(self.question)))
             self.send(message)
 
