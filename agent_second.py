@@ -24,13 +24,12 @@ class QuestionAgent(Agent):
 
     def on_start(self):
         super(QuestionAgent, self).on_start()
-        display_message(self.aid.localname, 'Question Agent started.')
+        display_message(self.aid.name, 'Question Agent started.')
 
     def react(self, message):
         super(QuestionAgent, self).react(message)
         if message.performative == ACLMessage.INFORM:
-            
-            display_message(self.aid.localname, 'Received message from ticket {}'.format(str(message.sender)))
+            display_message(self.aid.name, 'Received message from ticket {}'.format(str(message.sender.name)))
 
 
 
@@ -139,7 +138,6 @@ if __name__ == '__main__':
     agents = [m_agent, s_agent]
     for index, question in enumerate(gen_questions):
         aid = AID('question@localhost:{}'.format(53000 + index))
-        print(aid.name, aid.port)
         agent = QuestionAgent(question=question, aid=aid)
         question_agents_aids.append(aid)
         agents.append(agent)
