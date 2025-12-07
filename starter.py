@@ -25,6 +25,7 @@ class StarterAgent(Agent):
         call_later(15.0, self.send_message)
 
     def send_message(self):
+        display_message(self.aid.name, 'message sent')
         message = ACLMessage(ACLMessage.INFORM)
         message.add_receiver(MANAGER_AID)
         message.set_content(json.dumps({
