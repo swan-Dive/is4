@@ -29,7 +29,7 @@ class QuestionAgent(Agent):
 
     def react(self, message):
         super(QuestionAgent, self).react(message)
-        if message.performative == ACLMessage.INFORM:
+        if message.performative == ACLMessage.INFORM and 'ticket' in str(message.sender.name):
             display_message(self.aid.name, 'Received message from ticket {}'.format(str(message.sender.name)))
             message = ACLMessage(ACLMessage.INFORM)
             message.add_receiver(message.sender)
@@ -65,7 +65,7 @@ class TicketAgent(Agent):
     def send_get_new_question(self):
         message = ACLMessage(ACLMessage.INFORM)
         ch = secrets.choice(self.current_question_aids)
-        # self.current_question_aids.remove(ch)
+        self.current_question_aids.remove(ch)
         message.add_receiver(ch)
         display_message(self.aid.name, 'Sending message to {}'.format(str(ch.name)))
         message.set_content(json.dumps({
@@ -105,7 +105,7 @@ class ManagerAgent(Agent):
 
         for i in number_of_tickets:
             new_ticket_agent = secrets.choice(c_ticket_agents)
-            # c_ticket_agents.remove(new_ticket_agent)
+            c_ticket_agents.remove(new_ticket_agent)
 
             message = ACLMessage(ACLMessage.INFORM)
             message.add_receiver(new_ticket_agent)
