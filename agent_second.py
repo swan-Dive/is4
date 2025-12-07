@@ -56,13 +56,13 @@ class TicketAgent(Agent):
         super(TicketAgent, self).react(message)
 
         if message.performative == ACLMessage.INFORM:
-            if message.sender == MANAGER_AID:
+            if 'manager' in str(message.sender.name):
                 self.is_running = True
                 self.send_get_new_question()
             if 'question' in  str(message.sender.name):
                 self.questions.append(json.loads(message.content))
                 display_message(self.aid.name, 'Received question from question agent, questions: {}'.format(self.questions))
-            
+
 
     def send_get_new_question(self):
         message = ACLMessage(ACLMessage.INFORM)
