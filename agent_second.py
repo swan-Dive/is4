@@ -59,7 +59,7 @@ class TicketAgent(Agent):
             if message.sender == MANAGER_AID:
                 self.is_running = True
                 self.send_get_new_question()
-            if 'manager' in  str(message.sendername):
+            if 'manager' in  str(message.sender.name):
                 self.questions.append(json.loads(message.content))
                 display_message(self.aid.name, 'Received question from question agent, questions: {}'.format(self.questions))
 
