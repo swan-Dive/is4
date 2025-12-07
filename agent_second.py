@@ -24,12 +24,12 @@ class QuestionAgent(Agent):
 
     def on_start(self):
         super(QuestionAgent, self).on_start()
-        display_message(self.aid.localname, 'Question Agent started.')
+        display_message(self.aid, 'Question Agent started.')
 
     def react(self, message):
         super(QuestionAgent, self).react(message)
         if message.performative == ACLMessage.INFORM:
-            display_message(self.aid.localname, 'Received message from ticket manager')
+            display_message(self.aid, 'Received message from ticket manager')
 
 
 
