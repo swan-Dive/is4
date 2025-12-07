@@ -37,6 +37,8 @@ class QuestionAgent(Agent):
         ans_message = ACLMessage(ACLMessage.INFORM)
         ans_message.add_receiver(ticket_aid)
         ans_message.set_content(json.dumps(str(self.question)))
+        display_message(self.aid.name, 'Sending message to {}'.format(str(ticket_aid.name)))
+
         self.send(ans_message)
 
 class TicketAgent(Agent):
@@ -139,7 +141,7 @@ class StarterAgent(Agent):
     def on_start(self):
         super(StarterAgent, self).on_start()
         display_message(self.aid.localname, 'Starter Agent started.')
-        call_later(10.0, self.send_message)
+        call_later(15.0, self.send_message)
 
     def send_message(self):
         message = ACLMessage(ACLMessage.INFORM)
