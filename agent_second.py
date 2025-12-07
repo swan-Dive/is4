@@ -59,7 +59,6 @@ class TicketAgent(Agent):
 
     def react(self, message):
         super(TicketAgent, self).react(message)
-        display_message(self.aid.localname, 'message from:{}'.format(str(message.sender.name)))
 
         if message.performative == ACLMessage.INFORM:
             if 'manager' in str(message.sender.name):
@@ -96,6 +95,7 @@ class TicketAgent(Agent):
                 mid_diff += int(a_question.get('diff', 0))
             mid_diff = mid_diff / len(self.questions)
             message.set_content(str(mid_diff))
+            self.send(message)
 
 class ManagerAgent(Agent):
     def __init__(self, aid: AID, ticket_agents):
