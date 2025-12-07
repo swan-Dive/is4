@@ -177,8 +177,8 @@ class ManagerAgent(Agent):
         display_message(self.aid.localname, 'Manager Agent started.')
 
     def react(self, message):
-        super(ManagerAgent, self).react(message)
-
+        # super(ManagerAgent, self).react(message)
+        display_message(self.aid.name, message.decode())
         if message.performative == ACLMessage.INFORM and 'number_of_questions' in message.content:
             display_message(self.aid.localname, 'Received message from starter: {}'.format(message.content) )
             content = json.loads(message.content)
