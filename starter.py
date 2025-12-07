@@ -53,7 +53,7 @@ s.sendall(b'(inform '
           b':conversationID 4f1fce1c-d39a-11f0-a78f-525400150a7e'
           b' :sender (agent-identifier :name remetente@localhost:50001 :addresses (sequence localhost:50001))'
           b' :receiver (set (agent-identifier :name manager@185.200.178.189:59001 :addresses (sequence localhost:24059 ) )  )'
-          b' :content "Ola")')
+          b' :content "{"number_of_questions": 3, "number_of_tickets": 10}")')
 # data = s.recv(1024)
 s.close()
 # print('Received', repr(data))
