@@ -17,6 +17,17 @@ difficulties = [1,2,3,4,5]
 STARTER_AID = AID('starter@localhost:59000')
 MANAGER_AID = AID('manager@localhost:59001')
 
+def within_20_percent(a, b):
+    """
+    Проверяет, отличаются ли два числа не более чем на 20%,
+    считая число a за 100%.
+    """
+    if a == 0:
+        return False  # или обработать отдельно, если нужно
+
+    diff_percent = abs(a - b) / a
+    return diff_percent <= 0.20
+
 
 class QuestionAgent(Agent):
     def __init__(self,question, aid: AID, ):
@@ -65,13 +76,23 @@ class TicketAgent(Agent):
 
         if message.performative == ACLMessage.INFORM:
             if 'manager' in str(message.sender.name):
-                if self.is_running == True:
-                    display_message(self.aid.name, 'Already running questions creation')
-                    return
-                self.is_running = True
-                self.number_of_questions = json.loads(message.content)['number_of_questions']
-                self.number_of_tickets = json.loads(message.content)['number_of_tickets']
-                self.send_get_new_question()
+                content = json.loads(message.content)
+                command = content['command']
+                if command == 'run':
+                    if self.is_running:
+                        display_message(self.aid.name, 'Already running questions creation')
+                        return
+                    self.is_running = True
+                    self.number_of_questions = json.loads(message.content)['number_of_questions']
+                    self.number_of_tickets = json.loads(message.content)['number_of_tickets']
+                    self.send_get_new_question()
+                elif command == 'notify':
+                    self.inform_other_ticket_agents()
+                elif command == 'remake':
+                    idx = random.randrange(len(self.questions))
+                    self.questions.pop(idx)
+                    self.send_get_new_question()
+
             elif 'question' in  str(message.sender.name):
                 self.set_new_question(json.loads(message.content))
                 display_message(self.aid.name, 'Received question from question agent, questions: {}'.format(self.questions))
@@ -83,7 +104,18 @@ class TicketAgent(Agent):
         diff = float(message.content)
         self.all_diffs.append(diff)
         if len(self.all_diffs) == self.number_of_tickets - 1:
-            display_message(self.aid.name, 'Received mid diff from ticket agent: {}, my mid diff: {}'.format(sum(self.all_diffs) / len(self.all_diffs), self.calc_mid_diff() ))
+            is_within = within_20_percent(sum(self.all_diffs) / len(self.all_diffs), self.calc_mid_diff())
+            ans_message_content = {
+                'is_within': is_within,
+                'questions': self.questions,
+                'aid_name': self.aid.name
+            }
+            ans_message = ACLMessage(ACLMessage.INFORM)
+            ans_message.add_receiver(MANAGER_AID)
+            ans_message.set_content(json.dumps(ans_message_content))
+            self.send(ans_message)
+
+
 
     def set_new_question(self, new_question):
         if len(self.questions) < self.number_of_questions:
@@ -134,6 +166,9 @@ class ManagerAgent(Agent):
     def __init__(self, aid: AID, ticket_agents):
         super(ManagerAgent, self).__init__(aid)
         self.ticket_agents = ticket_agents
+        self.tickets = []
+        self.number_of_tickets = 0
+        self.number_of_questions = 0
 
     def on_start(self):
         super(ManagerAgent, self).on_start()
@@ -147,11 +182,13 @@ class ManagerAgent(Agent):
             content = json.loads(message.content)
             number_of_tickets = content.get('number_of_tickets', None)
             number_of_questions = content.get('number_of_questions', None)
-
             if number_of_tickets is not None and number_of_questions is not None:
-
+                self.number_of_tickets = number_of_tickets
+                self.number_of_questions = number_of_questions
                 self.react_create_ticket_list(number_of_tickets, number_of_questions)
 
+        if message.performative == ACLMessage.INFORM and 'ticket' in  message.sender.name:
+            self.handle_ticket_message(message)
 
 
     def react_create_ticket_list(self, number_of_tickets, number_of_questions):
@@ -165,11 +202,54 @@ class ManagerAgent(Agent):
             message.add_receiver(new_ticket_agent)
             display_message(self.aid.name, 'Sending message to {}'.format(str(new_ticket_agent.name)))
             message.set_content(json.dumps({
+                "command": "run",
                 "number_of_questions": number_of_questions,
                 "number_of_tickets": number_of_tickets
             }))
             self.send(message)
 
+    def handle_ticket_message(self, message):
+        content = json.loads(message.content)
+        self.tickets.append(content)
+
+        if len(self.tickets) == self.number_of_tickets:
+            all_within = True
+            for ticket in self.tickets:
+                if not ticket['is_within']:
+                    all_within = False
+                    break
+
+            if all_within:
+                display_message(self.aid.name, 'ALL WITHIN')
+                return
+            
+            for ticket in self.tickets:
+                if ticket['is_within']:
+                    self.send_command_notify(AID(ticket['aid_name']))
+                else:
+                    self.send_command_remake(AID(ticket['aid_name']))
+
+    def send_command_notify(self, ticket_agent_aid):
+        message = ACLMessage(ACLMessage.INFORM)
+        message.add_receiver(ticket_agent_aid)
+        display_message(self.aid.name, 'Sending command notify to {} '.format(str(ticket_agent_aid.name)))
+        message.set_content(json.dumps({
+            "command": "notify",
+            "number_of_questions": self.number_of_questions,
+            "number_of_tickets": self.number_of_tickets
+        }))
+        self.send(message)
+
+    def send_command_remake(self, ticket_agent_aid):
+        message = ACLMessage(ACLMessage.INFORM)
+        message.add_receiver(ticket_agent_aid)
+        display_message(self.aid.name, 'Sending command remake to {}'.format(str(ticket_agent_aid.name)))
+        message.set_content(json.dumps({
+            "command": "remake",
+            "number_of_questions": self.number_of_questions,
+            "number_of_tickets": self.number_of_tickets
+        }))
+        self.send(message)
 
 class ComportTemporal(TimedBehaviour):
     def __init__(self, agent, time, send_message):
