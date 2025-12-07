@@ -178,9 +178,8 @@ class ManagerAgent(Agent):
         display_message(self.aid.localname, 'Manager Agent started.')
 
     def react(self, message):
-        dummy_message = ACLMessage(ACLMessage.INFORM)
         try:
-            super(ManagerAgent, self).react(dummy_message)
+            super(ManagerAgent, self).react(message)
         except Exception as e:
             pass
         match = re.search(r':content\s*"(.+)"', str(message))
