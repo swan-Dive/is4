@@ -47,7 +47,7 @@ import socket
 
 host = "185.200.178.189"
 port = 59001                   # The same port as used by the server
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s = socket.socket(socket.AF_INET, socket.SOCK_RAW)
 s.connect((host, port))
 s.sendall(b'inform :conversationID 4f1fce1c-d39a-11f0-a78f-525400150a7e :sender (agent-identifier :name remetente@localhost:50001 :addresses (sequence localhost:50001)) :receiver (set (agent-identifier :name destinatario@localhost:50000 :addresses (sequence localhost:24059 ) )  ) :content "Ola" )')
 data = s.recv(1024)
