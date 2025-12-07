@@ -75,6 +75,7 @@ class TicketAgent(Agent):
     def react(self, message):
         super(TicketAgent, self).react(message)
         if message.performative == ACLMessage.INFORM:
+            display_message(self.aid.name, 'Received message from {}'.format(message.sender.name))
 
             if 'manager' in str(message.sender.name):
                 content = json.loads(message.content)
@@ -82,6 +83,7 @@ class TicketAgent(Agent):
                 display_message(self.aid.name, 'Received command: {}'.format(command))
 
                 if command == 'run':
+                    
                     if self.is_running:
                         display_message(self.aid.name, 'Already running questions creation')
                         return
@@ -90,8 +92,10 @@ class TicketAgent(Agent):
                     self.number_of_tickets = json.loads(message.content)['number_of_tickets']
                     self.send_get_new_question()
                 elif command == 'notify':
+                    self.is_running = True
                     self.inform_other_ticket_agents()
                 elif command == 'remake':
+                    self.is_running = True
                     idx = random.randrange(len(self.questions))
                     self.questions.pop(idx)
                     self.send_get_new_question()
@@ -118,6 +122,7 @@ class TicketAgent(Agent):
             ans_message.add_receiver(MANAGER_AID)
             ans_message.set_content(json.dumps(ans_message_content))
             self.all_diffs = []
+            self.is_running = False
             self.send(ans_message)
 
 
