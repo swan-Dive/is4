@@ -43,7 +43,7 @@ class TicketAgent(Agent):
     def on_start(self):
         super(TicketAgent, self).on_start()
         display_message(self.aid.localname, 'Ticket Agent started.')
-        self.call_later(10.0, self.send_message())
+        self.call_later(10.0, self.send_message)
 
     def react(self, message):
         super(TicketAgent, self).react(message)
