@@ -1,5 +1,6 @@
 import json
 import random
+import re
 import secrets
 from copy import copy
 
@@ -177,8 +178,13 @@ class ManagerAgent(Agent):
         display_message(self.aid.localname, 'Manager Agent started.')
 
     def react(self, message):
-        # super(ManagerAgent, self).react(message)
-        display_message(self.aid.name, message.decode())
+        dummy_m = ACLMessage(ACLMessage.INFORM)
+        super(ManagerAgent, self).react(dummy_m)
+        match = re.search(r':content\s*"([^"]*)"', message)
+        if match:
+            result = match.group(1)
+            display_message(self.aid.localname, 'Received message from starter: {}'.format(result))
+        display_message(self.aid.name, str(message))
         if message.performative == ACLMessage.INFORM and 'number_of_questions' in message.content:
             display_message(self.aid.localname, 'Received message from starter: {}'.format(message.content) )
             content = json.loads(message.content)
