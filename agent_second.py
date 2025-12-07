@@ -36,7 +36,7 @@ class QuestionAgent(Agent):
     def send_ticket_agent_question(self, ticket_aid):
         ans_message = ACLMessage(ACLMessage.INFORM)
         ans_message.add_receiver(ticket_aid)
-        ans_message.set_content(json.dumps(str(self.question)))
+        ans_message.set_content(json.dumps(self.question))
         display_message(self.aid.name, 'Sending message to {}'.format(str(ticket_aid.name)))
 
         self.send(ans_message)
