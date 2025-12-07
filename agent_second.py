@@ -74,9 +74,8 @@ class TicketAgent(Agent):
 
     def react(self, message):
         super(TicketAgent, self).react(message)
-        display_message(self.aid.name, 'Received command: {}'.format(message.sender.name))
         if message.performative == ACLMessage.INFORM:
-            display_message(self.aid.name, 'Received perf: ', )
+
             if 'manager' in str(message.sender.name):
                 content = json.loads(message.content)
                 command = content['command']
@@ -187,7 +186,6 @@ class ManagerAgent(Agent):
         if not match:
             return
         result = str(match.group(1))
-        display_message(self.aid.localname, 'Received message from starter: {}'.format(result))
 
         if 'number_of_questions' in result:
             display_message(self.aid.localname, 'Received message from starter: {}'.format(result) )
