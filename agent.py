@@ -31,7 +31,7 @@ class Destinatario(Agent):
 
     def react(self, message):
         super(Destinatario, self).react(message)
-        display_message(self.aid.localname, 'Mensagem recebida from {}'.format(message.sender.name))
+        display_message(self.aid.localname, 'Mensagem recebida from {}'.format(str(message)))
 
 
 if __name__ == '__main__':
