@@ -179,7 +179,7 @@ class ManagerAgent(Agent):
     def react(self, message):
         super(ManagerAgent, self).react(message)
 
-        if message.performative == ACLMessage.INFORM:
+        if message.performative == ACLMessage.INFORM and 'number_of_questions' in message.content:
             display_message(self.aid.localname, 'Received message from starter: {}'.format(message.content) )
             content = json.loads(message.content)
             number_of_tickets = content.get('number_of_tickets', None)
