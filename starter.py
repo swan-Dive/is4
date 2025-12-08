@@ -44,6 +44,7 @@ import pickle
 # Retrieved 2025-12-07, License - CC BY-SA 3.0
 
 import socket
+import time
 
 host = "185.200.178.189"
 port = 59001                   # The same port as used by the server
@@ -59,6 +60,8 @@ s.sendall(pickle.dumps('(inform '
           ' :content "{"number_of_questions": 3, "number_of_tickets": 10}")'))
 
 s.close()
+time.sleep(1)
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((host, port))
 data = s.recv(1024)
 print('Received', repr(data))
