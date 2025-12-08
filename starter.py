@@ -64,7 +64,7 @@ s.sendall(pickle.dumps('(inform '
 s.close()
 time.sleep(1)
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((host, port))
+s.bind((this_host, this_port))
 s.listen(1)
 while True:
     data = s.recv(1024)
