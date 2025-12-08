@@ -256,7 +256,8 @@ class ManagerAgent(Agent):
                 display_message(self.aid.name, 'ALL WITHIN')
                 if self.ip_port:
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    s.connect(self.ip_port)
+                    parts = (str(self.ip_port).split(""))
+                    s.connect((parts[0], int(parts[1])))
                     s.sendall(pickle.dumps(self.tickets))
                     s.close()
                 self.tickets = []
