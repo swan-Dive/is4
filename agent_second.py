@@ -17,6 +17,8 @@ fields = ['Теоретическая информатика', "Техничес
 difficulties = [1,2,3,4,5]
 STARTER_AID = AID('starter@localhost:59000')
 MANAGER_AID = AID('manager@185.200.178.189:59001')
+match_sender_pattern = r":[^ ]+ starter@(\d{1,3}(?:\.\d{1,3}){3}:\d+)"
+
 
 def within_20_percent(a, b):
     """
@@ -198,15 +200,12 @@ class ManagerAgent(Agent):
         if not match_content:
             return
         received_content = str(match_content.group(1))
-
         match_sender = re.search(r':sender\s*\((.+)\)', str(message))
-        if not match_sender:
-            display_message(
-                self.aid.localname, 'Sender not found' )
-            return
-        received_sender = str(match_sender.group(1))
+        ip_port = None
+        if match_sender:
+            ip_port = match_sender.group(1)
         display_message(
-            self.aid.localname, 'Sender: {}'.format(received_sender) )
+            self.aid.localname, 'Sender: {}'.format(ip_port) )
         if 'number_of_questions' in received_content:
             display_message(self.aid.localname, 'Received message from starter: {}'.format(received_content) )
             display_message(self.aid.localname, 'Received from {}'.format(message.sender.name))
