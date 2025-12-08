@@ -66,11 +66,22 @@ time.sleep(1)
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((this_host, this_port))
 s.listen(1)
+all_d = b''
+closed = False
 while True:
     conn, addr = s.accept()
     with conn:
         print(f"Connected by {addr}")
         while True:
             data = conn.recv(1024)
-            print(f'Received: {data}')
+            if data:
+                all_d += data
+            else:
+                print("Client closed connection.")
+                print(pickle.loads(all_d))
+                closed = True
+                break
+
+    if closed:
+        break
 s.close()
