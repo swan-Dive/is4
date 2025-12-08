@@ -29,7 +29,7 @@ def within_20_percent(a, b):
         return False  # или обработать отдельно, если нужно
 
     diff_percent = abs(a - b) / a
-    return diff_percent <= 0.20
+    return diff_percent <= 0.35
 
 
 class QuestionAgent(Agent):
@@ -200,7 +200,7 @@ class ManagerAgent(Agent):
         if not match_content:
             return
         received_content = str(match_content.group(1))
-        match_sender = re.search(r':sender\s*\((.+)\)', str(message))
+        match_sender = re.search(match_sender_pattern, str(message))
         ip_port = None
         if match_sender:
             ip_port = match_sender.group(1)
@@ -208,7 +208,6 @@ class ManagerAgent(Agent):
             self.aid.localname, 'Sender: {}'.format(ip_port) )
         if 'number_of_questions' in received_content:
             display_message(self.aid.localname, 'Received message from starter: {}'.format(received_content) )
-            display_message(self.aid.localname, 'Received from {}'.format(message.sender.name))
             content = json.loads(received_content)
             number_of_tickets = content.get('number_of_tickets', None)
             number_of_questions = content.get('number_of_questions', None)
