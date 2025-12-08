@@ -1,7 +1,9 @@
 import json
+import pickle
 import random
 import re
 import secrets
+import socket
 from copy import copy
 
 from pade.acl.aid import AID
@@ -154,8 +156,8 @@ class TicketAgent(Agent):
 
     def send_get_new_question(self):
         message = ACLMessage(ACLMessage.INFORM)
-        ch = secrets.choice(self.current_question_aids)
-        self.current_question_aids.remove(ch)
+        ch = secrets.choice(self.question_agents_aids)
+        # self.current_question_aids.remove(ch)
         message.add_receiver(ch)
         display_message(self.aid.name, 'Sending message to {}'.format(str(ch.name)))
         message.set_content(json.dumps({
@@ -186,6 +188,7 @@ class ManagerAgent(Agent):
         self.tickets = []
         self.number_of_tickets = 0
         self.number_of_questions = 0
+        self.ip_port = None
 
     def on_start(self):
         super(ManagerAgent, self).on_start()
@@ -201,11 +204,11 @@ class ManagerAgent(Agent):
             return
         received_content = str(match_content.group(1))
         match_sender = re.search(match_sender_pattern, str(message))
-        ip_port = None
+
         if match_sender:
-            ip_port = match_sender.group(1)
+            self.ip_port = match_sender.group(1)
             display_message(
-                self.aid.localname, 'The sender is: {}'.format(ip_port))
+                self.aid.localname, 'The sender is: {}'.format(self.ip_port))
 
         if 'number_of_questions' in received_content:
             display_message(self.aid.localname, 'Received message from starter: {}'.format(received_content) )
@@ -251,6 +254,11 @@ class ManagerAgent(Agent):
 
             if all_within:
                 display_message(self.aid.name, 'ALL WITHIN')
+                if self.ip_port:
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    s.connect(self.ip_port)
+                    s.sendall(pickle.dumps(self.tickets))
+                    s.close()
                 self.tickets = []
                 return
 
