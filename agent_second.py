@@ -194,15 +194,23 @@ class ManagerAgent(Agent):
             super(ManagerAgent, self).react(message)
         except Exception as e:
             pass
-        match = re.search(r':content\s*"(.+)"', str(message))
-        if not match:
+        match_content = re.search(r':content\s*"(.+)"', str(message))
+        if not match_content:
             return
-        result = str(match.group(1))
+        received_content = str(match_content.group(1))
 
-        if 'number_of_questions' in result:
-            display_message(self.aid.localname, 'Received message from starter: {}'.format(result) )
+        match_sender = re.search(r':sender\s*\((.+)\)', str(message))
+        if not match_sender:
+            display_message(
+                self.aid.localname, 'Sender not found' )
+            return
+        received_sender = str(match_sender.group(1))
+        display_message(
+            self.aid.localname, 'Sender: {}'.format(received_sender) )
+        if 'number_of_questions' in received_content:
+            display_message(self.aid.localname, 'Received message from starter: {}'.format(received_content) )
             display_message(self.aid.localname, 'Received from {}'.format(message.sender.name))
-            content = json.loads(result)
+            content = json.loads(received_content)
             number_of_tickets = content.get('number_of_tickets', None)
             number_of_questions = content.get('number_of_questions', None)
             if number_of_tickets is not None and number_of_questions is not None:
