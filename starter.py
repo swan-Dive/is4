@@ -47,7 +47,9 @@ import socket
 import time
 
 host = "185.200.178.189"
+this_host = "155.212.171.31"
 port = 59001                   # The same port as used by the server
+this_port = 59000
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((host, port))
 
@@ -62,6 +64,9 @@ s.sendall(pickle.dumps('(inform '
 s.close()
 time.sleep(1)
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((host, port))
-data = s.recv(1024)
-print('Received', repr(data))
+s.bind((host, port))
+s.listen(1)
+while True:
+    data = s.recv(1024)
+    print('Received', repr(data))
+s.close()
