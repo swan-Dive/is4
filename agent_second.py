@@ -116,7 +116,7 @@ class TicketAgent(Agent):
             return
         diff = float(message.content)
         self.all_diffs.append(diff)
-        
+
         if len(self.all_diffs) == self.number_of_tickets - 1:
             is_within = within_20_percent(sum(self.all_diffs) / len(self.all_diffs), self.calc_mid_diff())
             ans_message_content = {
@@ -201,6 +201,7 @@ class ManagerAgent(Agent):
 
         if 'number_of_questions' in result:
             display_message(self.aid.localname, 'Received message from starter: {}'.format(result) )
+            display_message(self.aid.localname, 'Received from {}'.format(message.sender.name))
             content = json.loads(result)
             number_of_tickets = content.get('number_of_tickets', None)
             number_of_questions = content.get('number_of_questions', None)
@@ -276,39 +277,6 @@ class ManagerAgent(Agent):
         }))
         self.send(message)
 
-class ComportTemporal(TimedBehaviour):
-    def __init__(self, agent, time, send_message):
-        super(ComportTemporal, self).__init__(agent, time)
-        self.send_message = send_message
-    def on_time(self):
-        super(ComportTemporal, self).on_time()
-        display_message(self.agent.aid.localname, 'Hello World!')
-        self.send_message()
-
-
-
-class StarterAgent(Agent):
-    def __init__(self, aid: AID):
-        super(StarterAgent, self).__init__(aid)
-        # comp_temp = ComportTemporal(self,  15.0, self.send_message)
-        # self.behaviours.append(comp_temp)
-
-
-    def on_start(self):
-        super(StarterAgent, self).on_start()
-        display_message(self.aid.localname, 'Starter Agent started.')
-        call_later(15.0, self.send_message)
-
-    def send_message(self):
-        message = ACLMessage(ACLMessage.INFORM)
-        message.add_receiver(MANAGER_AID)
-        message.set_content(json.dumps({
-            "number_of_questions": 4,
-            "number_of_tickets": 10
-        }))
-        self.send(message)
-
-
 if __name__ == '__main__':
     gen_questions = [{
         "id": 'Qid_{}'.format(i),
@@ -337,7 +305,6 @@ if __name__ == '__main__':
         agents.append(agent)
 
     m_agent = ManagerAgent(MANAGER_AID, ticket_agents=ticket_agents_aids)
-    # s_agent = StarterAgent(STARTER_AID)
     agents.append(m_agent)
 
     # agents.append(s_agent)
