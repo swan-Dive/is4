@@ -294,12 +294,11 @@ class ManagerAgent(Agent):
         self.send(message)
 
 if __name__ == '__main__':
-    gen_questions = [{
-        "id": 'Qid_{}'.format(i),
-        "diff": random.randint(min(difficulties), max(difficulties)),
-        "field": secrets.choice(fields)
-    } for i in range(0, 100)]
-
+          
+    gen_questions = None
+    with open("data.json", 'r') as f:
+        gen_questions = json.loads(f.read())
+          
     question_agents_aids = list()
     ticket_agents_aids = list()
     agents = []
