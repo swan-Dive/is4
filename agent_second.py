@@ -123,12 +123,13 @@ class TicketAgent(Agent):
 
         if len(self.all_diffs) == self.number_of_tickets - 1:
             is_within = within_20_percent(sum(self.all_diffs) / len(self.all_diffs), self.calc_mid_diff())
+            display_message(self.aid.name, 'My mid diff is : {}, all_agents diff is: {}'.format( self.calc_mid_diff(), sum(self.all_diffs) / len(self.all_diffs)))
             ans_message_content = {
                 'is_within': is_within,
                 'questions': self.questions,
                 'aid_name': self.aid.name
             }
-            display_message(self.aid.name, 'Sending done message to manager, content: {}'.format(json.dumps(ans_message_content)))
+            # display_message(self.aid.name, 'Sending done message to manager, content: {}'.format(json.dumps(ans_message_content)))
             ans_message = ACLMessage(ACLMessage.INFORM)
             ans_message.add_receiver(MANAGER_AID)
             ans_message.set_content(json.dumps(ans_message_content))
