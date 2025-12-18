@@ -79,7 +79,7 @@ while True:
                 all_d += data
             else:
                 print("Client closed connection.")
-                l = pickle.loads(add_d)
+                l = pickle.loads(all_d)
                 closed = True
                 break
 
