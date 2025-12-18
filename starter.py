@@ -87,4 +87,8 @@ while True:
         break
 s.close()
 for ind, line in enumerate(l):
-    print(f'Билет #{ind + 1}: {line}')
+    questions = line["questions"]
+    print(f"Билет #{ind + 1}")
+    for q_ind, q in enumerate(questions):
+          print(f"Вопрос #{q_ind + 1}: {q['question']}, тема: {q['field']}, сложность: {q['diff']}")
+    print("-----------------------------------------------------")
