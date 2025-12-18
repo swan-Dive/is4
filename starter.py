@@ -68,6 +68,7 @@ s.bind((this_host, this_port))
 s.listen(1)
 all_d = b''
 closed = False
+l = None
 while True:
     conn, addr = s.accept()
     with conn:
@@ -78,10 +79,12 @@ while True:
                 all_d += data
             else:
                 print("Client closed connection.")
-                print(pickle.loads(all_d))
+                l = pickle.loads(add_d)
                 closed = True
                 break
 
     if closed:
         break
 s.close()
+for ind, line in enumerate(l):
+    print(f'Билет #{ind + 1}: {line}')
