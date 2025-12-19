@@ -59,7 +59,7 @@ s.sendall(pickle.dumps('(inform '
           ':conversationID 4f1fce1c-d39a-11f0-a78f-525400150a7e'
           ' :sender (agent-identifier :name starter@155.212.171.31:59000 :addresses (sequence localhost:59000))'
           ' :receiver (set (agent-identifier :name manager@185.200.178.189:59001 :addresses (sequence manager@185.200.178.189:59001 ) )  )'
-          ' :content "{"number_of_questions": 3, "number_of_tickets": 10}")'))
+          ' :content "{"number_of_questions": 4, "number_of_tickets": 10}")'))
 
 s.close()
 time.sleep(1)
