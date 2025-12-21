@@ -122,7 +122,7 @@ class TicketAgent(Agent):
         diff = float(message.content)
         self.all_diffs.append(diff)
 
-        if len(self.all_diffs) == self.number_of_tickets - 1 and not self.send_ticket_back:
+        if len(self.all_diffs) == self.number_of_tickets - 1 and len(self.questions) == self.number_of_questions and not self.send_ticket_back:
             self.all_diffs.append(self.calc_mid_diff())
             is_within = within_20_percent(sum(self.all_diffs) / len(self.all_diffs), self.calc_mid_diff())
             display_message(self.aid.name, 'My mid diff is : {}, all_agents diff is: {}'.format( self.calc_mid_diff(), sum(self.all_diffs) / len(self.all_diffs)))
