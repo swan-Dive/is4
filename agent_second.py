@@ -87,7 +87,7 @@ class TicketAgent(Agent):
                 content = json.loads(message.content)
                 command = content['command']
                 display_message(self.aid.name, 'Received command: {}'.format(command))
-                elf.send_ticket_back = False
+                self.send_ticket_back = False
                 if command == 'run':
 
                     if self.is_running:
