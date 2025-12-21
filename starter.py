@@ -90,7 +90,6 @@ for ind, line in enumerate(l):
     questions = line["questions"]
     print("-----------------------------------------------------")
     print(f"Билет #{ind + 1}")
-    print(questions)
     for q_ind, q in enumerate(questions):
           print(f"Вопрос #{q_ind + 1}: {q['question']}, тема: {q['field']}, сложность: {q['diff']}")
     print("-----------------------------------------------------")
