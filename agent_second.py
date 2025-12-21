@@ -21,6 +21,15 @@ STARTER_AID = AID('starter@localhost:59000')
 MANAGER_AID = AID('manager@185.200.178.189:59001')
 match_sender_pattern = r":[^ ]+ starter@(\d{1,3}(?:\.\d{1,3}){3}:\d+)"
 
+class ComportTemporal(TimedBehaviour):
+    def __init__(self, agent, time, f):
+        super(ComportTemporal, self).__init__(agent, time)
+        self.f = f
+
+    def on_time(self):
+        super(ComportTemporal, self).on_time()
+        self.f()
+
 
 def within_20_percent(a, b):
     """
@@ -70,6 +79,10 @@ class TicketAgent(Agent):
         self.is_running = False
         self.send_ticket_back = False
 
+        comp_temp = ComportTemporal(self, 5.0)
+
+        self.behaviours.append(comp_temp)
+
     def on_start(self):
         super(TicketAgent, self).on_start()
         self.ticket_agents_aids.remove(self.aid)
@@ -114,14 +127,13 @@ class TicketAgent(Agent):
                 display_message(self.aid.name, 'Received question from question agent, questions: {}'.format(self.questions))
 
             elif 'ticket' in str(message.sender.name):
-                self.handle_receive_ticket_agent_notif(message)
+                diff = float(message.content)
+                self.all_diffs.append(diff)
+                self.handle_receive_ticket_agent_notif()
 
-    def handle_receive_ticket_agent_notif(self, message):
+    def handle_receive_ticket_agent_notif(self):
         if not self.is_running:
             return
-        diff = float(message.content)
-        self.all_diffs.append(diff)
-
         if len(self.all_diffs) == self.number_of_tickets - 1 and len(self.questions) == self.number_of_questions and not self.send_ticket_back:
             self.all_diffs.append(self.calc_mid_diff())
             is_within = within_20_percent(sum(self.all_diffs) / len(self.all_diffs), self.calc_mid_diff())
