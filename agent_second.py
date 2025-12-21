@@ -79,7 +79,7 @@ class TicketAgent(Agent):
         self.is_running = False
         self.send_ticket_back = False
 
-        comp_temp = ComportTemporal(self, 5.0)
+        comp_temp = ComportTemporal(self, 5.0, self.handle_receive_ticket_agent_notif)
 
         self.behaviours.append(comp_temp)
 
