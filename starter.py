@@ -86,10 +86,19 @@ while True:
     if closed:
         break
 s.close()
+all_d = 0
+n_questions = 0
 for ind, line in enumerate(l):
     questions = line["questions"]
     print("-----------------------------------------------------")
     print(f"Билет #{ind + 1}")
+    mid_diff = 0
     for q_ind, q in enumerate(questions):
-          print(f"Вопрос #{q_ind + 1}: {q['question']}, тема: {q['field']}, сложность: {q['diff']}")
+        print(f"Вопрос #{q_ind + 1}: {q['question']}, тема: {q['field']}, сложность: {q['diff']}")
+        mid_diff += int(q['diff'])
+    print(f'Средняя сложность: {mid_diff / len(questions)}')
+    n_questions += len(questions)
+    all_d += mid_diff
     print("-----------------------------------------------------")
+
+print(f'Общая средняя сложность: {all_d / n_questions}')
