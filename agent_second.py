@@ -12,11 +12,6 @@ from pade.behaviours.protocols import TimedBehaviour
 from pade.core.agent import Agent
 from pade.misc.utility import display_message, start_loop, call_later
 
-fields = ['Теоретическая информатика', "Техническая информатика", 'Прикладная информатика', 'Информационные системы',
-          'Компьютерные сети и телекоммуникации', 'Базы данных', 'Информационная безопасность и кибербезопасность',
-          'Анализ данных и визуализация']
-
-difficulties = [1,2,3,4,5]
 STARTER_AID = AID('starter@localhost:59000')
 MANAGER_AID = AID('manager@185.200.178.189:59001')
 match_sender_pattern = r":[^ ]+ starter@(\d{1,3}(?:\.\d{1,3}){3}:\d+)"
@@ -40,7 +35,7 @@ def within_20_percent(a, b):
         return False  # или обработать отдельно, если нужно
 
     diff_percent = abs(a - b) / a
-    return diff_percent <= 0.35
+    return diff_percent <= 0.1
 
 
 class QuestionAgent(Agent):
